@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ciclo — Calculadora de sueño</title>
+<meta name="description" content="Duerme en ciclos de ~90 minutos y despierta ligero. Calculadora de sueño, plan nocturno, siestas, cronotipo y deuda de sueño. Sin registro, todo en tu navegador.">
+<meta name="theme-color" content="#0B0E24">
+<meta property="og:title" content="Ciclo — Calculadora de sueño">
+<meta property="og:description" content="Elige a qué hora acostarte o poner la alarma para despertar al final de un ciclo, no en medio.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+html{scroll-behavior:smooth}
+body{margin:0;background:#101430;color:#F5EFE2;font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#F4A950;text-decoration:none}
+a:hover{color:#F5EFE2}
+button{font-family:'Outfit',sans-serif}
+section{scroll-margin-top:70px}
+input[type="time"]::-webkit-calendar-picker-indicator{filter:invert(0.9);opacity:0.6;cursor:pointer}
+input[type="range"]{accent-color:#F4A950;cursor:pointer}
+input[type="number"]{font-family:'Outfit',sans-serif}
+details summary::-webkit-details-marker{display:none}
+:is(button,a,input,[role="button"],summary):focus-visible{outline:2px solid #F4A950;outline-offset:2px;border-radius:6px}
+
+.nav-link{color:#B7BADF}
+.nav-link:hover{color:#F4A950}
+
+.tab-btn{border:none;cursor:pointer;font-size:15px;font-weight:500;padding:10px 20px;border-radius:999px;background:transparent;color:#B7BADF;transition:background .25s,color .25s}
+.tab-btn.active{background:#F4A950;color:#101430}
+
+.time-input{background:rgba(245,239,226,0.07);border:1px solid rgba(139,143,199,0.35);border-radius:12px;color:#F5EFE2;font-family:'Outfit',sans-serif;font-size:26px;font-weight:600;padding:8px 14px;font-variant-numeric:tabular-nums}
+
+.btn-amber{cursor:pointer;border:1px solid rgba(244,169,80,0.5);background:rgba(244,169,80,0.1);color:#F4A950;font-size:15px;font-weight:500;padding:11px 20px;border-radius:12px;transition:background .2s}
+.btn-amber:hover{background:rgba(244,169,80,0.2)}
+.btn-ghost{cursor:pointer;border:1px solid rgba(139,143,199,0.35);background:transparent;color:#B7BADF;font-size:13px;font-weight:500;padding:9px 16px;border-radius:10px;transition:all .2s}
+.btn-ghost:hover{border-color:#F4A950;color:#F4A950}
+
+.chip{cursor:pointer;font-size:13px;padding:6px 12px;border-radius:999px;border:1px solid rgba(139,143,199,0.3);background:transparent;color:#8B8FC7;transition:all .2s}
+.chip.active{border-color:#F4A950;background:rgba(244,169,80,0.12);color:#F4A950}
+
+.setting{display:flex;align-items:center;gap:10px;font-size:14px;color:#8B8FC7}
+.setting strong{color:#F5EFE2;font-variant-numeric:tabular-nums;font-weight:600}
+
+.res-card{cursor:pointer;background:rgba(245,239,226,0.045);border:1px solid rgba(139,143,199,0.25);border-radius:18px;padding:22px 20px 18px;display:flex;flex-direction:column;gap:10px;transition:border-color .25s,transform .2s,background .25s}
+.res-card:hover{background:rgba(245,239,226,0.08);transform:translateY(-2px)}
+.res-card.selected{border-color:#F4A950}
+.res-label{align-self:flex-start;font-size:12px;font-weight:600;letter-spacing:0.6px;text-transform:uppercase;padding:4px 10px;border-radius:999px}
+.res-time{font-family:'Fraunces',serif;font-size:clamp(38px,4.6vw,52px);font-weight:500;line-height:1;font-variant-numeric:tabular-nums;color:#F5EFE2;white-space:nowrap}
+.res-meta{font-size:14px;color:#8B8FC7}
+.btn-ics{margin-top:4px;cursor:pointer;border:1px solid rgba(139,143,199,0.35);background:transparent;color:#B7BADF;font-size:13px;font-weight:500;padding:8px 12px;border-radius:10px;transition:all .2s}
+.btn-ics:hover{border-color:#F4A950;color:#F4A950}
+
+.card{background:rgba(245,239,226,0.045);border:1px solid rgba(139,143,199,0.22);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:8px}
+
+.plan-row{display:flex;align-items:baseline;gap:14px;padding:11px 0;border-bottom:1px solid rgba(139,143,199,0.14)}
+.plan-row:last-child{border-bottom:none}
+.plan-time{font-family:'Fraunces',serif;font-size:24px;font-weight:500;font-variant-numeric:tabular-nums;color:#F5EFE2;min-width:104px;white-space:nowrap}
+.plan-what{font-size:15px;color:#B7BADF}
+.plan-row.hito .plan-time{color:#F4A950}
+.plan-row.hito .plan-what{color:#F5EFE2;font-weight:500}
+
+.quiz-opt{cursor:pointer;text-align:left;border:1px solid rgba(139,143,199,0.3);background:rgba(245,239,226,0.03);color:#F5EFE2;font-size:15px;padding:14px 18px;border-radius:12px;transition:all .2s;line-height:1.4}
+.quiz-opt:hover{border-color:#F4A950;background:rgba(244,169,80,0.07)}
+
+.debt-input{width:58px;background:rgba(245,239,226,0.07);border:1px solid rgba(139,143,199,0.35);border-radius:10px;color:#F5EFE2;font-size:16px;font-weight:600;padding:8px 6px;text-align:center;font-variant-numeric:tabular-nums}
+.debt-bar{width:100%;max-width:42px;border-radius:6px 6px 0 0;transition:height .4s ease,background .4s}
+
+.faq-item{background:rgba(245,239,226,0.04);border:1px solid rgba(139,143,199,0.2);border-radius:14px;padding:18px 20px}
+.faq-item summary{cursor:pointer;font-size:16px;font-weight:500;color:#F5EFE2;list-style:none}
+.faq-item p{color:#8B8FC7;font-size:14.5px;line-height:1.6;margin:12px 0 0;font-weight:300}
+
+.edu-block{border-left:2px solid rgba(244,169,80,0.5);padding-left:22px}
+.edu-block h3{font-family:'Fraunces',serif;font-size:21px;font-weight:500;margin:0 0 8px}
+.edu-block p{color:#8B8FC7;font-size:15.5px;line-height:1.65;margin:0;font-weight:300}
+
+.arc-path{stroke-dasharray:1;stroke-dashoffset:1;animation:arcDraw 1.8s cubic-bezier(.4,0,.2,1) .1s forwards}
+.arc-scroll{overflow-x:auto;overflow-y:hidden}
+.arc-scroll svg{min-width:560px}
+
+@keyframes cicloBreathe{0%{opacity:0}100%{opacity:1}}
+@keyframes cicloFadeUp{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes arcDraw{0%{stroke-dashoffset:1}100%{stroke-dashoffset:0}}
+@media (prefers-reduced-motion: reduce){*{animation-duration:0.01ms !important;animation-delay:0ms !important;transition-duration:0.01ms !important}}
+</style>
+</head>
+<body>
+
+<div style="position:fixed;inset:0;z-index:0;pointer-events:none;animation:cicloBreathe 2s ease-out both">
+  <div style="position:absolute;inset:0;background:linear-gradient(180deg,#0b0e24 0%,#101430 55%,#161c42 100%)"></div>
+  <div id="bg-sunset" style="position:absolute;inset:0;transition:opacity 1.8s ease;background:linear-gradient(180deg,#171540 0%,#2b2150 55%,#6e4229 100%);opacity:0"></div>
+  <div id="bg-dawn" style="position:absolute;inset:0;transition:opacity 1.8s ease;background:linear-gradient(180deg,#0e1230 0%,#1d2148 55%,#3a3560 100%);opacity:0"></div>
+  <div id="bg-sunrise" style="position:absolute;inset:0;transition:opacity 1.8s ease;background:linear-gradient(180deg,#182046 0%,#334069 55%,#a8683c 100%);opacity:0"></div>
+  <svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMin slice" style="position:absolute;inset:0;width:100%;height:100%;opacity:0.55">
+    <circle cx="120" cy="90" r="1.4" fill="#F5EFE2"></circle><circle cx="340" cy="150" r="1" fill="#8B8FC7"></circle><circle cx="520" cy="60" r="1.6" fill="#F5EFE2"></circle><circle cx="700" cy="180" r="1" fill="#F5EFE2"></circle><circle cx="880" cy="80" r="1.3" fill="#8B8FC7"></circle><circle cx="1050" cy="140" r="1.5" fill="#F5EFE2"></circle><circle cx="220" cy="260" r="1" fill="#8B8FC7"></circle><circle cx="960" cy="270" r="1" fill="#F5EFE2"></circle><circle cx="610" cy="300" r="1.2" fill="#8B8FC7"></circle><circle cx="80" cy="420" r="1" fill="#8B8FC7"></circle><circle cx="1150" cy="380" r="1.2" fill="#F5EFE2"></circle><circle cx="430" cy="230" r="0.9" fill="#F5EFE2"></circle>
+  </svg>
+</div>
+
+<nav style="position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 24px;background:rgba(13,16,38,0.65);backdrop-filter:blur(12px);border-bottom:1px solid rgba(139,143,199,0.15)">
+  <a href="#calculadora" style="font-family:'Fraunces',serif;font-size:22px;font-weight:600;color:#F5EFE2;letter-spacing:0.5px">Ciclo</a>
+  <div style="display:flex;gap:22px;flex-wrap:wrap;font-size:14px;font-weight:500">
+    <a class="nav-link" href="#plan">Mi plan</a>
+    <a class="nav-link" href="#siestas">Siestas</a>
+    <a class="nav-link" href="#cronotipo">Cronotipo</a>
+    <a class="nav-link" href="#deuda">Deuda</a>
+    <a class="nav-link" href="#faq">FAQ</a>
+  </div>
+</nav>
+
+<main style="position:relative;z-index:1">
+
+<section id="calculadora" style="max-width:1080px;margin:0 auto;padding:120px 24px 40px;animation:cicloFadeUp 0.9s ease 0.15s both">
+  <div style="display:flex;justify-content:center;margin-bottom:22px">
+    <div id="countdown" style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border:1px solid rgba(244,169,80,0.35);border-radius:999px;background:rgba(244,169,80,0.08);font-size:14px;color:#F4A950"></div>
+  </div>
+  <h1 style="font-family:'Fraunces',serif;font-size:clamp(30px,5vw,46px);font-weight:500;text-align:center;margin:0 0 8px;line-height:1.15">Duerme en ciclos, despierta ligero</h1>
+  <p style="text-align:center;color:#8B8FC7;font-size:17px;margin:0 auto 34px;max-width:560px;font-weight:300">El cerebro duerme en ciclos de ~90 minutos. Despertar al final de uno — no en medio — cambia cómo se siente tu mañana.</p>
+
+  <div style="display:flex;justify-content:center;margin-bottom:26px">
+    <div style="display:inline-flex;background:rgba(245,239,226,0.06);border:1px solid rgba(139,143,199,0.25);border-radius:999px;padding:4px;gap:4px">
+      <button id="tab-wake" class="tab-btn active">Quiero despertarme a las…</button>
+      <button id="tab-now" class="tab-btn">Si me acuesto ahora…</button>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:16px 28px;margin-bottom:18px">
+    <label id="row-wake" style="display:flex;align-items:center;gap:12px;font-size:15px;color:#B7BADF">Despertar a las
+      <input id="in-wake" class="time-input" type="time" value="07:00">
+    </label>
+    <div id="row-bed" style="display:none;flex-wrap:wrap;justify-content:center;align-items:center;gap:16px 28px">
+      <label style="display:flex;align-items:center;gap:12px;font-size:15px;color:#B7BADF">Me acuesto a las
+        <input id="in-bed" class="time-input" type="time" value="23:00">
+      </label>
+      <button id="btn-bed-now" class="btn-amber">Ahora</button>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:14px 30px;margin-bottom:10px">
+    <label class="setting">Tardo en dormirme: <strong id="latency-val">15 min</strong>
+      <input id="in-latency" type="range" min="5" max="45" step="5" value="15" style="width:130px">
+    </label>
+    <label class="setting" title="Los ciclos reales varían entre 80 y 110 minutos según la persona">Mi ciclo dura: <strong id="cyc-val">90 min</strong>
+      <input id="in-cyc" type="range" min="80" max="110" step="5" value="90" style="width:110px">
+    </label>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:14px 30px;margin-bottom:36px;font-size:14px;color:#8B8FC7">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">Edad:
+      <span id="age-chips" style="display:contents"></span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">Horas:
+      <span id="fmt-chips" style="display:contents"></span>
+    </div>
+  </div>
+
+  <p style="text-align:center;font-size:15px;color:#8B8FC7;margin:0 0 18px"><span id="results-heading"></span> <span style="color:#5E64A8">· recomendado para tu edad: <span id="rec-txt"></span></span></p>
+  <p id="chrono-note" style="display:none;text-align:center;font-size:14px;color:#F4A950;margin:-8px 0 18px"></p>
+
+  <div id="results-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:44px"></div>
+
+  <div style="background:rgba(11,14,36,0.55);border:1px solid rgba(139,143,199,0.2);border-radius:20px;padding:26px 26px 18px">
+    <h2 style="font-family:'Fraunces',serif;font-size:22px;font-weight:500;margin:0 0 4px">El arco de tu noche</h2>
+    <p id="arc-subtitle" style="font-size:14px;color:#8B8FC7;margin:0 0 14px"></p>
+    <div id="arc-box" class="arc-scroll" style="width:100%"></div>
+    <p style="font-size:12.5px;color:#5E64A8;margin:10px 0 0">Cada punto marca el final de un ciclo: una buena hora para que suene la alarma. Solo horas — nada que no puedas comprobar con tu propio reloj.</p>
+  </div>
+</section>
+
+<section id="plan" style="max-width:1080px;margin:0 auto;padding:40px 24px 30px">
+  <h2 style="font-family:'Fraunces',serif;font-size:30px;font-weight:500;margin:0 0 6px">Mi plan de esta noche</h2>
+  <p style="color:#8B8FC7;font-size:16px;margin:0 0 26px;font-weight:300">Tu cuenta regresiva de hábitos según la opción que elegiste arriba. Cópiala o agéndala — mañana te lo agradeces.</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;align-items:start">
+    <div class="card" style="padding:10px 22px">
+      <div id="plan-rows"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div id="routine-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px"></div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button id="btn-copy-plan" class="btn-amber">Copiar plan</button>
+        <button id="btn-plan-ics" class="btn-ghost" style="padding:11px 16px">Recordatorio de acostarme (.ics)</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="max-width:760px;margin:0 auto;padding:40px 24px">
+  <div class="edu-block">
+    <h3>¿Por qué 90 minutos?</h3>
+    <p>Durante la noche el cerebro repite un patrón: sueño ligero, sueño profundo y REM, en ese orden, una y otra vez. Cada vuelta dura en promedio 90 minutos. Despertar al final de una vuelta — cuando el sueño vuelve a ser ligero — se siente natural. Despertar en medio del sueño profundo se siente como salir de anestesia: eso es la <em>inercia de sueño</em>, y puede durar más de media hora.</p>
+  </div>
+</section>
+
+<section id="siestas" style="max-width:1080px;margin:0 auto;padding:50px 24px">
+  <h2 style="font-family:'Fraunces',serif;font-size:30px;font-weight:500;margin:0 0 6px">Calculadora de siestas</h2>
+  <p style="color:#8B8FC7;font-size:15px;margin:0 0 18px;font-weight:300">Tu ventana ideal de siesta es <strong id="nap-window" style="color:#F4A950;font-variant-numeric:tabular-nums"></strong> — entre 6 y 8 horas después de tu hora de despertar.</p>
+  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin:0 0 26px">
+    <button id="btn-nap-now" class="btn-amber">Me acuesto ahora</button>
+    <span style="color:#8B8FC7;font-size:14px">Base: <span id="nap-base"></span> + <span id="nap-latency">15</span> min de latencia</span>
+  </div>
+  <div id="naps-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px"></div>
+</section>
+
+<section id="cronotipo" style="max-width:760px;margin:0 auto;padding:50px 24px">
+  <h2 style="font-family:'Fraunces',serif;font-size:30px;font-weight:500;margin:0 0 6px">¿Cuál es tu cronotipo?</h2>
+  <p style="color:#8B8FC7;font-size:16px;margin:0 0 26px;font-weight:300">5 preguntas. Tu resultado se guarda solo en este navegador y ajusta las recomendaciones a tu reloj interno.</p>
+  <div id="quiz-box"></div>
+</section>
+
+<section id="deuda" style="max-width:900px;margin:0 auto;padding:50px 24px">
+  <h2 style="font-family:'Fraunces',serif;font-size:30px;font-weight:500;margin:0 0 6px">Deuda de sueño semanal</h2>
+  <p style="color:#8B8FC7;font-size:16px;margin:0 0 24px;font-weight:300">Apunta cuánto dormiste cada noche y compáralo con tu meta. Se guarda en tu navegador.</p>
+  <div id="debt-inputs" style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;margin-bottom:26px"></div>
+  <div style="position:relative;max-width:560px">
+    <div id="debt-goal-line" style="position:absolute;left:0;right:0;border-top:1px dashed rgba(244,169,80,0.55);pointer-events:none"><span style="position:absolute;right:0;top:-18px;font-size:11px;color:#F4A950">meta</span></div>
+    <div id="debt-bars" style="display:flex;align-items:flex-end;gap:10px;height:150px;padding:0 4px;border-bottom:1px solid rgba(139,143,199,0.3)"></div>
+  </div>
+  <div id="debt-labels" style="display:flex;gap:10px;max-width:560px;padding:6px 4px 0"></div>
+  <p style="margin:24px 0 0;font-size:17px;color:#F5EFE2;line-height:1.55;max-width:640px"><strong id="debt-headline" style="color:#F4A950"></strong> <span id="debt-verdict"></span></p>
+  <button id="btn-debt-reset" class="btn-ghost" style="margin-top:18px">Empezar semana nueva</button>
+</section>
+
+<section style="max-width:760px;margin:0 auto;padding:40px 24px;display:flex;flex-direction:column;gap:34px">
+  <div class="edu-block">
+    <h3>Despertar entre ciclos se siente fatal — y tiene nombre</h3>
+    <p>La alarma no sabe en qué fase estás. Si suena durante el sueño profundo, el cuerpo despierta pero el cerebro tarda: confusión, pesadez, mal humor. No es que dormiste poco — es que dormiste <em>hasta mal punto</em>. Por eso a veces 6 horas se sienten mejor que 8: terminaste el ciclo.</p>
+  </div>
+  <div class="edu-block">
+    <h3>La hora fija vale más que la hora perfecta</h3>
+    <p>El reloj interno aprende por repetición. Acostarte y despertar a la misma hora — incluso el fin de semana — hace más por tu descanso que cualquier cálculo puntual. Usa esta página para elegir tu horario una vez, y luego defiéndelo toda la semana.</p>
+  </div>
+</section>
+
+<section id="faq" style="max-width:760px;margin:0 auto;padding:50px 24px 80px">
+  <h2 style="font-family:'Fraunces',serif;font-size:30px;font-weight:500;margin:0 0 24px">Preguntas frecuentes</h2>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <details class="faq-item"><summary>¿Los ciclos de 90 minutos funcionan igual para todos?</summary><p>No exactamente: los ciclos reales varían entre 80 y 110 minutos según la persona y la noche. Por eso esta calculadora te deja ajustar la duración. Si sueles despertar pesado con 90, prueba 85 o 100 y observa una semana.</p></details>
+    <details class="faq-item"><summary>¿Y si trabajo de noche?</summary><p>Los cálculos funcionan igual: elige tu hora de despertar y respeta los ciclos. Lo crítico en turno nocturno es proteger la oscuridad al dormir de día (cortinas opacas, antifaz) y mantener horarios lo más estables posible, incluso en días libres.</p></details>
+    <details class="faq-item"><summary>¿Qué hago si no me duermo en 15 minutos?</summary><p>Primero, ajusta el control de latencia a tu realidad. Segundo: si llevas más de 20 minutos dando vueltas, levántate, haz algo aburrido con luz tenue y vuelve cuando notes sueño. Quedarse en la cama despierto entrena al cerebro a asociar cama con vigilia.</p></details>
+    <details class="faq-item"><summary>¿Posponer la alarma (snooze) cuenta como dormir más?</summary><p>No. Esos bloques de 5–10 minutos son sueño fragmentado que no completa ningún ciclo, y cada campanazo reinicia la inercia. Es mejor poner la alarma a la hora real en que vas a levantarte — al final de un ciclo — y ganar esos minutos de sueño continuo.</p></details>
+    <details class="faq-item"><summary>¿Puedo recuperar sueño el fin de semana?</summary><p>Solo en parte. Dormir 11 horas el sábado alivia, pero desplaza tu reloj interno y el lunes cuesta el doble. Es más efectivo recuperar con 30–60 minutos extra por noche durante la semana siguiente.</p></details>
+    <details class="faq-item"><summary>¿La siesta arruina mi noche?</summary><p>Depende de cuándo y cuánto. Dentro de tu ventana ideal (6–8 h tras despertar) y de 26 minutos o menos, casi nunca. Siestas largas o tardías consumen la "presión de sueño" que necesitas acumular para dormirte en la noche.</p></details>
+    <details class="faq-item"><summary>¿Por qué el último café va 8 horas antes?</summary><p>La cafeína tiene una vida media de 5–6 horas: la mitad de tu café de las 16:00 sigue circulando a las 21:00–22:00. Aunque te duermas, reduce el sueño profundo. 8 horas de margen deja el sistema razonablemente limpio.</p></details>
+    <details class="faq-item"><summary>¿El alcohol ayuda a dormir?</summary><p>Ayuda a <em>quedarse</em> dormido y arruina el resto: fragmenta la segunda mitad de la noche y suprime el sueño REM. Si bebes, hazlo temprano y con agua de por medio; no lo uses como somnífero.</p></details>
+    <details class="faq-item"><summary>¿Dónde se guardan mis datos?</summary><p>Solo en tu navegador (localStorage). No hay cuentas, servidores ni analítica: si borras los datos del sitio, desaparecen. Nada sale de tu dispositivo.</p></details>
+  </div>
+  <p style="margin:40px 0 0;text-align:center;color:#5E64A8;font-size:13px">Ciclo · hecho para dormir mejor. Los cálculos son orientativos y no sustituyen consejo médico.</p>
+</section>
+
+</main>
+
+<script>
+(function () {
+'use strict';
+
+// ---------- estado ----------
+var S = {
+  mode: 'wake', wakeTime: '07:00', bedTime: '23:00', latency: 15, cyc: 90, selected: 0,
+  age: '26-64', fmt12: detectFmt12(),
+  quizStep: 0, quizAnswers: [], quizDone: false, chrono: null,
+  debtHours: [7, 7, 7, 7, 7, 7, 7], debtGoal: 8, napAt: null
+};
+
+function detectFmt12() {
+  try { return !!new Intl.DateTimeFormat(undefined, { hour: 'numeric' }).resolvedOptions().hour12; }
+  catch (e) { return false; }
+}
+
+// ---------- persistencia (solo en este navegador) ----------
+var KEY = 'ciclo:v2';
+function save() {
+  try {
+    localStorage.setItem(KEY, JSON.stringify({
+      wakeTime: S.wakeTime, latency: S.latency, cyc: S.cyc, selected: S.selected,
+      age: S.age, fmt12: S.fmt12, quizDone: S.quizDone, chrono: S.chrono,
+      debtHours: S.debtHours, debtGoal: S.debtGoal
+    }));
+  } catch (e) { /* modo privado o storage lleno: la app sigue funcionando */ }
+}
+function loadSaved() {
+  try {
+    var d = JSON.parse(localStorage.getItem(KEY));
+    if (!d || typeof d !== 'object') return;
+    if (/^\d\d:\d\d$/.test(d.wakeTime)) S.wakeTime = d.wakeTime;
+    if (d.latency >= 5 && d.latency <= 45) S.latency = d.latency;
+    if (d.cyc >= 80 && d.cyc <= 110) S.cyc = d.cyc;
+    if (d.selected >= 0 && d.selected <= 3) S.selected = d.selected;
+    if (REC[d.age]) S.age = d.age;
+    if (typeof d.fmt12 === 'boolean') S.fmt12 = d.fmt12;
+    if (d.quizDone && CHRONO[d.chrono]) { S.quizDone = true; S.chrono = d.chrono; }
+    if (Array.isArray(d.debtHours) && d.debtHours.length === 7) {
+      S.debtHours = d.debtHours.map(function (v) { return Math.max(0, Math.min(14, Number(v) || 0)); });
+    }
+    if (d.debtGoal >= 4 && d.debtGoal <= 12) S.debtGoal = d.debtGoal;
+  } catch (e) { /* datos corruptos: se ignoran */ }
+}
+
+// ---------- utilidades de tiempo ----------
+var $ = function (id) { return document.getElementById(id); };
+var pad = function (n) { return String(n).padStart(2, '0'); };
+function nowHM() { var d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+function parseHM(s) { var p = (s || '0:0').split(':'); return Number(p[0]) * 60 + (Number(p[1]) || 0); }
+function mod1440(m) { return ((m % 1440) + 1440) % 1440; }
+function fmt(min) {
+  var m = mod1440(min), h = Math.floor(m / 60), mm = pad(m % 60);
+  if (!S.fmt12) return pad(h) + ':' + mm;
+  return (h % 12 || 12) + ':' + mm + (h < 12 ? ' am' : ' pm');
+}
+function durLabel(min) { var h = Math.floor(min / 60), m = Math.round(min % 60); return m ? h + ' h ' + m + ' min' : h + ' h'; }
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+// ---------- recomendaciones por edad ----------
+var REC = {
+  '6-13': { min: 9, ideal: 10.5, txt: '9–11 h' }, '14-17': { min: 8, ideal: 9, txt: '8–10 h' },
+  '18-25': { min: 7.5, ideal: 9, txt: '7–9 h' }, '26-64': { min: 7.5, ideal: 9, txt: '7–9 h' },
+  '65+': { min: 7, ideal: 7.5, txt: '7–8 h' }
+};
+function qual(hours) {
+  var r = REC[S.age];
+  if (hours >= r.ideal) return { label: 'Ideal', color: '#9DBA8F', bg: 'rgba(157,186,143,0.16)' };
+  if (hours >= r.min) return { label: 'Muy bien', color: '#F5EFE2', bg: 'rgba(245,239,226,0.14)' };
+  if (hours >= r.min - 1.5) return { label: 'Aceptable', color: '#B7BADF', bg: 'rgba(139,143,199,0.18)' };
+  return { label: 'Mínimo viable', color: '#F4A950', bg: 'rgba(244,169,80,0.16)' };
+}
+
+var COUNTS = [6, 5, 4, 3];
+
+// ---------- derivados compartidos ----------
+function selBedMin() {
+  var wakeMin = parseHM(S.wakeTime), bedMin = parseHM(S.bedTime);
+  if (S.mode === 'wake') return mod1440(wakeMin - (COUNTS[S.selected] * S.cyc + S.latency));
+  return bedMin;
+}
+function selWakeMin() {
+  return mod1440(selBedMin() + S.latency + COUNTS[S.selected] * S.cyc);
+}
+
+// ---------- .ics ----------
+function downloadIcs(targetMin, summary) {
+  var now = new Date();
+  var ev = new Date(now);
+  ev.setHours(Math.floor(mod1440(targetMin) / 60), mod1440(targetMin) % 60, 0, 0);
+  if (ev <= now) ev.setDate(ev.getDate() + 1);
+  var fd = function (d) { return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + 'T' + pad(d.getHours()) + pad(d.getMinutes()) + '00'; };
+  var end = new Date(ev.getTime() + 30 * 60000);
+  var ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Ciclo//Calculadora de sueno//ES', 'CALSCALE:GREGORIAN',
+    'BEGIN:VEVENT', 'UID:ciclo-' + Date.now() + '@ciclo.app', 'DTSTAMP:' + fd(now), 'DTSTART:' + fd(ev), 'DTEND:' + fd(end),
+    'SUMMARY:' + summary, 'DESCRIPTION:Generado por Ciclo. Un ciclo de sueno dura ~90 minutos.',
+    'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:' + summary, 'TRIGGER:-PT10M', 'END:VALARM',
+    'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+  var blob = new Blob([ics], { type: 'text/calendar' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'recordatorio-ciclo.ics';
+  a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+}
+
+// ---------- fondo vivo ----------
+function renderBackground() {
+  var bh = Math.floor(selBedMin() / 60);
+  var phase = 'night';
+  if (bh >= 17 && bh <= 20) phase = 'sunset';
+  else if (bh >= 4 && bh <= 6) phase = 'dawn';
+  else if (bh >= 7 && bh <= 16) phase = 'sunrise';
+  $('bg-sunset').style.opacity = phase === 'sunset' ? '1' : '0';
+  $('bg-dawn').style.opacity = phase === 'dawn' ? '1' : '0';
+  $('bg-sunrise').style.opacity = phase === 'sunrise' ? '1' : '0';
+}
+
+// ---------- cuenta regresiva ----------
+function renderCountdown() {
+  var n = COUNTS[S.selected];
+  if (S.mode === 'wake') {
+    var bed = selBedMin();
+    var d = new Date();
+    var nowMin = d.getHours() * 60 + d.getMinutes();
+    var past = mod1440(nowMin - bed);
+    $('countdown').textContent = past < 45
+      ? 'Tu ventana para acostarte (' + n + ' ciclos) es ahora mismo'
+      : 'Para tu opción de ' + n + ' ciclos, acuéstate en ' + durLabel(mod1440(bed - nowMin));
+  } else {
+    $('countdown').textContent = 'Con ' + n + ' ciclos, tu alarma: ' + fmt(selWakeMin());
+  }
+}
+
+// ---------- tabs y filas de hora ----------
+function renderTabs() {
+  var isWake = S.mode === 'wake';
+  $('tab-wake').classList.toggle('active', isWake);
+  $('tab-now').classList.toggle('active', !isWake);
+  $('row-wake').style.display = isWake ? 'flex' : 'none';
+  $('row-bed').style.display = isWake ? 'none' : 'flex';
+}
+
+// ---------- chips de edad y formato ----------
+function renderAge() {
+  var ages = ['6-13', '14-17', '18-25', '26-64', '65+'];
+  $('age-chips').innerHTML = ages.map(function (a) {
+    return '<button class="chip' + (S.age === a ? ' active' : '') + '" data-age="' + a + '">' +
+      a.replace('-', '–') + (a === '65+' ? '' : ' años') + '</button>';
+  }).join('');
+  Array.prototype.forEach.call($('age-chips').querySelectorAll('button'), function (b) {
+    b.addEventListener('click', function () { S.age = b.dataset.age; renderAge(); renderCalc(); });
+  });
+  $('rec-txt').textContent = REC[S.age].txt;
+}
+
+function renderFmt() {
+  $('fmt-chips').innerHTML = [['12', true], ['24', false]].map(function (o) {
+    return '<button class="chip' + (S.fmt12 === o[1] ? ' active' : '') + '" data-f="' + o[0] + '">' + o[0] + ' h</button>';
+  }).join('');
+  Array.prototype.forEach.call($('fmt-chips').querySelectorAll('button'), function (b) {
+    b.addEventListener('click', function () { S.fmt12 = b.dataset.f === '12'; renderFmt(); renderCalc(); });
+  });
+}
+
+// ---------- resultados ----------
+function renderResults() {
+  var isWake = S.mode === 'wake';
+  var wakeMin = parseHM(S.wakeTime), bedMin = parseHM(S.bedTime);
+
+  $('results-heading').textContent = isWake
+    ? 'Para despertar a las ' + fmt(wakeMin) + ', acuéstate a una de estas horas:'
+    : 'Si te acuestas a las ' + fmt(bedMin) + ', pon la alarma a una de estas horas:';
+  $('rec-txt').textContent = REC[S.age].txt;
+
+  var ci = S.chrono ? CHRONO[S.chrono] : null;
+  $('chrono-note').style.display = ci ? 'block' : 'none';
+  $('chrono-note').textContent = ci ? ci.note : '';
+
+  $('results-grid').innerHTML = COUNTS.map(function (n, i) {
+    var sleepMin = n * S.cyc;
+    var timeMin = isWake ? mod1440(wakeMin - (sleepMin + S.latency)) : mod1440(bedMin + S.latency + sleepMin);
+    var q = qual(sleepMin / 60);
+    return '<div class="res-card' + (i === S.selected ? ' selected' : '') + '" role="button" tabindex="0" data-i="' + i + '" data-time="' + timeMin + '" aria-pressed="' + (i === S.selected) + '">' +
+      '<span class="res-label" style="background:' + q.bg + ';color:' + q.color + '">' + q.label + '</span>' +
+      '<span class="res-time">' + fmt(timeMin) + '</span>' +
+      '<span class="res-meta">' + n + ' ciclos · ' + durLabel(sleepMin) + ' de sueño</span>' +
+      '<button class="btn-ics">Descargar recordatorio</button></div>';
+  }).join('');
+
+  Array.prototype.forEach.call($('results-grid').querySelectorAll('.res-card'), function (card) {
+    var select = function () { S.selected = Number(card.dataset.i); renderCalc(); };
+    card.addEventListener('click', select);
+    card.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(); }
+    });
+    card.querySelector('.btn-ics').addEventListener('click', function (e) {
+      e.stopPropagation();
+      downloadIcs(Number(card.dataset.time), isWake ? 'Hora de dormir' : 'Hora de despertar');
+    });
+  });
+}
+
+// ---------- arco de la noche ----------
+function buildArcSVG(n) {
+  var bed = selBedMin();
+  var total = S.latency + n * S.cyc;
+  var W = 760, H = 288, hy = 236, xa = 74, xb = 686;
+  var cx = (xa + xb) / 2, rx = (xb - xa) / 2, ry = 168;
+  var pt = function (f) {
+    var a = Math.PI * (1 - f);
+    return { x: cx + rx * Math.cos(a), y: hy - ry * Math.sin(a) };
+  };
+  var arcTo = function (f1, f2) {
+    var p1 = pt(f1), p2 = pt(f2);
+    return 'M' + p1.x.toFixed(1) + ' ' + p1.y.toFixed(1) + ' A' + rx + ' ' + ry + ' 0 0 1 ' + p2.x.toFixed(1) + ' ' + p2.y.toFixed(1);
+  };
+  var onsetF = S.latency / total;
+  var inner = '<defs><linearGradient id="arc-grad" gradientUnits="userSpaceOnUse" x1="' + pt(onsetF).x.toFixed(1) + '" y1="0" x2="' + xb + '" y2="0">' +
+    '<stop offset="0" stop-color="#8B8FC7"/><stop offset="1" stop-color="#F4A950"/></linearGradient></defs>';
+  // estrellas
+  inner += '<circle cx="150" cy="52" r="1.3" fill="#F5EFE2" opacity="0.7"/><circle cx="300" cy="30" r="1" fill="#8B8FC7" opacity="0.8"/><circle cx="475" cy="44" r="1.4" fill="#F5EFE2" opacity="0.6"/><circle cx="600" cy="26" r="1" fill="#8B8FC7" opacity="0.8"/><circle cx="222" cy="96" r="0.9" fill="#F5EFE2" opacity="0.5"/><circle cx="540" cy="90" r="1.1" fill="#8B8FC7" opacity="0.6"/>';
+  // horizonte
+  inner += '<line x1="20" x2="' + (W - 20) + '" y1="' + hy + '" y2="' + hy + '" stroke="rgba(139,143,199,0.3)"/>';
+  // tramo de latencia (punteado) y tramo dormido (degradado noche→amanecer)
+  inner += '<path d="' + arcTo(0, onsetF) + '" fill="none" stroke="rgba(139,143,199,0.5)" stroke-width="2" stroke-dasharray="3 6" stroke-linecap="round"/>';
+  inner += '<path class="arc-path" d="' + arcTo(onsetF, 1) + '" fill="none" stroke="url(#arc-grad)" stroke-width="2.5" stroke-linecap="round" pathLength="1"/>';
+  // luna al acostarte
+  var pBed = pt(0);
+  inner += '<circle cx="' + pBed.x + '" cy="' + (pBed.y - 1) + '" r="7" fill="#F5EFE2" opacity="0.9"/><circle cx="' + (pBed.x + 3) + '" cy="' + (pBed.y - 3.5) + '" r="6" fill="#101430"/>';
+  // puntos de fin de ciclo con su hora
+  for (var i = 1; i <= n; i++) {
+    var f = (S.latency + i * S.cyc) / total;
+    var p = pt(f);
+    var t = bed + S.latency + i * S.cyc;
+    if (i < n) {
+      inner += '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="4" fill="#101430" stroke="#B7BADF" stroke-width="1.6"/>';
+      inner += '<text x="' + p.x.toFixed(1) + '" y="' + (p.y - 12).toFixed(1) + '" text-anchor="middle" fill="#B7BADF" font-size="11.5" font-family="Outfit,sans-serif">' + fmt(t) + '</text>';
+    } else {
+      inner += '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="8" fill="#F4A950"/><circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="13" fill="none" stroke="rgba(244,169,80,0.35)" stroke-width="2"/>';
+    }
+    inner += '<text x="' + p.x.toFixed(1) + '" y="' + (p.y + 20).toFixed(1) + '" text-anchor="middle" fill="#5E64A8" font-size="10.5" font-family="Outfit,sans-serif">' + (i < n ? 'ciclo ' + i : '') + '</text>';
+  }
+  // etiquetas de horizonte
+  inner += '<text x="' + xa + '" y="' + (hy + 24) + '" text-anchor="middle" fill="#B7BADF" font-size="13" font-family="Outfit,sans-serif">a la cama</text>' +
+    '<text x="' + xa + '" y="' + (hy + 44) + '" text-anchor="middle" fill="#F5EFE2" font-size="17" font-weight="600" font-family="Outfit,sans-serif">' + fmt(bed) + '</text>';
+  inner += '<text x="' + xb + '" y="' + (hy + 24) + '" text-anchor="middle" fill="#F4A950" font-size="13" font-family="Outfit,sans-serif">alarma</text>' +
+    '<text x="' + xb + '" y="' + (hy + 44) + '" text-anchor="middle" fill="#F4A950" font-size="17" font-weight="600" font-family="Outfit,sans-serif">' + fmt(bed + total) + '</text>';
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:auto;display:block" role="img" aria-label="Arco de la noche: de acostarte a las ' + fmt(bed) + ' hasta la alarma a las ' + fmt(bed + total) + ', con la hora del final de cada ciclo">' + inner + '</svg>';
+}
+
+function renderArc() {
+  var n = COUNTS[S.selected];
+  $('arc-subtitle').textContent = n + ' ciclos de ' + S.cyc + ' min · te duermes hacia las ' + fmt(selBedMin() + S.latency) + ' · ' + durLabel(n * S.cyc) + ' de sueño';
+  $('arc-box').innerHTML = buildArcSVG(n);
+}
+
+// ---------- plan de esta noche ----------
+var ROUTINE = [
+  { emoji: '☕', off: 480, title: 'Último café', desc: 'La cafeína tiene una vida media de 5–6 h: la mitad sigue activa mucho después de tomarla.' },
+  { emoji: '🍽️', off: 180, title: 'Última comida pesada', desc: 'Digerir acostado fragmenta el sueño y favorece el reflujo. Cena ligera después de esta hora.' },
+  { emoji: '🏋️', off: 120, title: 'Último ejercicio intenso', desc: 'El ejercicio sube temperatura y adrenalina; el cuerpo necesita ~2 h para volver a bajar.' },
+  { emoji: '📱', off: 60, title: 'Pantallas fuera', desc: 'La luz azul frena la melatonina, la señal química de que ya es de noche.' }
+];
+
+function planLines() {
+  var bed = selBedMin(), n = COUNTS[S.selected];
+  var lines = ROUTINE.map(function (r) { return { emoji: r.emoji, time: bed - r.off, what: r.title, hito: false }; });
+  lines.push({ emoji: '🛏️', time: bed, what: 'A la cama', hito: true });
+  lines.push({ emoji: '😴', time: bed + S.latency, what: 'Dormido (aprox.)', hito: false });
+  lines.push({ emoji: '⏰', time: bed + S.latency + n * S.cyc, what: 'Alarma · ' + n + ' ciclos · ' + durLabel(n * S.cyc), hito: true });
+  return lines;
+}
+
+function renderPlan() {
+  $('plan-rows').innerHTML = planLines().map(function (l) {
+    return '<div class="plan-row' + (l.hito ? ' hito' : '') + '"><span style="font-size:19px">' + l.emoji + '</span>' +
+      '<span class="plan-time">' + fmt(l.time) + '</span><span class="plan-what">' + esc(l.what) + '</span></div>';
+  }).join('');
+
+  $('routine-grid').innerHTML = ROUTINE.map(function (r) {
+    return '<div class="card" style="padding:16px 18px;gap:6px">' +
+      '<span style="font-size:14.5px;font-weight:600;color:#F5EFE2">' + r.emoji + ' ' + r.title + '</span>' +
+      '<span style="font-size:13px;color:#8B8FC7;line-height:1.45">' + r.desc + '</span></div>';
+  }).join('');
+}
+
+function planText() {
+  var out = '🌙 Mi plan de sueño — Ciclo\n';
+  planLines().forEach(function (l) { out += l.emoji + ' ' + fmt(l.time) + ' · ' + l.what + '\n'; });
+  if (S.chrono) out += '\nCronotipo: ' + CHRONO[S.chrono].emoji + ' ' + CHRONO[S.chrono].name;
+  return out;
+}
+
+function copyPlan(btn) {
+  var t = planText();
+  var done = function () {
+    btn.textContent = 'Copiado ✓';
+    setTimeout(function () { btn.textContent = 'Copiar plan'; }, 1800);
+  };
+  var fallback = function () {
+    var ta = document.createElement('textarea');
+    ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) { /* sin permiso: no pasa nada */ }
+    document.body.removeChild(ta);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, fallback);
+  else fallback();
+}
+
+// ---------- siestas ----------
+var NAPS = [
+  { name: 'Power nap', dur: 20, desc: 'Recarga atención y ánimo sin entrar en sueño profundo: despiertas sin inercia.' },
+  { name: 'Siesta NASA', dur: 26, desc: 'El estándar probado en pilotos: +54% de alerta y +34% de rendimiento en los estudios originales.' },
+  { name: 'Ciclo completo', dur: 90, desc: 'Restaura de verdad — memoria y creatividad incluidas — pero solo si tienes el tiempo y estás dentro de tu ventana.' }
+];
+
+function renderNaps() {
+  var base = parseHM(S.napAt || nowHM());
+  var wake = S.mode === 'wake' ? parseHM(S.wakeTime) : selWakeMin();
+  $('nap-window').textContent = fmt(wake + 360) + ' – ' + fmt(wake + 480);
+  $('nap-base').textContent = fmt(base);
+  $('nap-latency').textContent = S.latency;
+  $('naps-grid').innerHTML = NAPS.map(function (n) {
+    return '<div class="card" style="border-radius:18px;padding:24px 22px;gap:10px">' +
+      '<span style="font-size:15px;font-weight:600;color:#F5EFE2">' + n.name + ' <span style="color:#8B8FC7;font-weight:400">· ' + n.dur + ' min</span></span>' +
+      '<span style="font-size:13px;color:#8B8FC7;letter-spacing:0.4px;text-transform:uppercase">Alarma a las</span>' +
+      '<span style="font-family:\'Fraunces\',serif;font-size:clamp(34px,4vw,44px);font-weight:500;line-height:1;font-variant-numeric:tabular-nums;color:#F4A950;white-space:nowrap">' + fmt(base + S.latency + n.dur) + '</span>' +
+      '<span style="font-size:13.5px;color:#8B8FC7;line-height:1.45">' + n.desc + '</span></div>';
+  }).join('');
+}
+
+// ---------- cronotipo ----------
+var QUIZ = [
+  { q: 'Sin alarma ni compromisos, ¿a qué hora despertarías naturalmente?', opts: [
+    { t: 'Antes de las 6:30, sin esfuerzo', k: 'leon' }, { t: 'Entre 7:00 y 8:30', k: 'oso' },
+    { t: 'Después de las 9:30', k: 'lobo' }, { t: 'Impredecible: cada día distinto', k: 'delfin' }] },
+  { q: '¿En qué momento del día rindes más?', opts: [
+    { t: 'Temprano en la mañana', k: 'leon' }, { t: 'Media mañana a mediodía', k: 'oso' },
+    { t: 'Tarde-noche', k: 'lobo' }, { t: 'A ratos: viene y va', k: 'delfin' }] },
+  { q: '¿Cómo te sientes en los primeros minutos tras despertar?', opts: [
+    { t: 'Alerta casi de inmediato', k: 'leon' }, { t: 'Bien después de unos minutos', k: 'oso' },
+    { t: 'Zombi: necesito una hora o más', k: 'lobo' }, { t: 'Cansado aunque haya dormido suficiente', k: 'delfin' }] },
+  { q: 'Es viernes por la noche. ¿Tu escenario típico?', opts: [
+    { t: 'En cama antes de las 22:30', k: 'leon' }, { t: 'Cena tranquila y a dormir hacia medianoche', k: 'oso' },
+    { t: 'La noche apenas empieza', k: 'lobo' }, { t: 'Intento dormir pero doy vueltas', k: 'delfin' }] },
+  { q: '¿Cuál es tu relación con la cafeína?', opts: [
+    { t: 'Una temprano y suficiente', k: 'leon' }, { t: 'Una o dos por la mañana', k: 'oso' },
+    { t: 'La necesito por la tarde para arrancar', k: 'lobo' }, { t: 'Me afecta muchísimo, incluso temprano', k: 'delfin' }] }
+];
+
+var CHRONO = {
+  leon: { emoji: '🦁', name: 'León', desc: 'Madrugador nato. Tu energía llega con el amanecer y se agota temprano en la noche. Alrededor del 15% de las personas.', sleep: '21:30 – 05:30', prod: '06:00 – 12:00', tip: 'Protege tus mañanas: agenda lo importante antes del mediodía y no alargues las noches — pagas cada hora robada al inicio del día.', note: '🦁 Como León, las opciones más tempranas de esta lista van contigo.' },
+  oso: { emoji: '🐻', name: 'Oso', desc: 'Tu ritmo sigue al sol, como la mayoría (~55% de las personas). Duermes bien de noche y rindes a media mañana.', sleep: '23:00 – 07:00', prod: '10:00 – 14:00', tip: 'Tu riesgo es la deriva: cada noche 20 minutos más tarde. Un horario fijo de acostarte te da más que cualquier truco.', note: '🐻 Como Oso, la opción de 5–6 ciclos alrededor de las 23:00 es tu zona natural.' },
+  lobo: { emoji: '🐺', name: 'Lobo', desc: 'Nocturno de verdad (~15% de las personas). Tu cerebro despega cuando otros ya bostezan.', sleep: '00:00 – 08:00', prod: '16:00 – 22:00', tip: 'No te fuerces a dormir a las 21:00: llegarás antes frustrado que dormido. Acuéstate tarde pero consistente, y usa luz brillante al despertar.', note: '🐺 Como Lobo, prioriza las opciones más tardías — no fuerces acostarte antes de las 23:00.' },
+  delfin: { emoji: '🐬', name: 'Delfín', desc: 'Sueño ligero e irregular (~10% de las personas). Despiertas con facilidad y te cuesta desconectar.', sleep: '23:30 – 06:30', prod: '10:00 – 14:00', tip: 'Tu mejor herramienta es la rutina estricta: misma hora siempre, cero cafeína después del mediodía, y la cama solo para dormir.', note: '🐬 Como Delfín, la consistencia importa más que la hora exacta: elige una opción y repítela toda la semana.' }
+};
+
+function renderQuiz() {
+  var box = $('quiz-box');
+  if (!S.quizDone) {
+    var cur = QUIZ[Math.min(S.quizStep, 4)];
+    box.innerHTML = '<div style="background:rgba(245,239,226,0.045);border:1px solid rgba(139,143,199,0.22);border-radius:18px;padding:28px 26px">' +
+      '<p style="font-size:13px;color:#8B8FC7;letter-spacing:0.6px;text-transform:uppercase;margin:0 0 10px">Pregunta ' + (S.quizStep + 1) + ' de 5</p>' +
+      '<p style="font-family:\'Fraunces\',serif;font-size:22px;font-weight:500;margin:0 0 20px;line-height:1.35">' + cur.q + '</p>' +
+      '<div style="display:flex;flex-direction:column;gap:10px">' +
+      cur.opts.map(function (o) { return '<button class="quiz-opt" data-k="' + o.k + '">' + esc(o.t) + '</button>'; }).join('') +
+      '</div></div>';
+    Array.prototype.forEach.call(box.querySelectorAll('.quiz-opt'), function (b) {
+      b.addEventListener('click', function () {
+        S.quizAnswers.push(b.dataset.k);
+        if (S.quizStep >= 4) {
+          var tally = {};
+          S.quizAnswers.forEach(function (k) { tally[k] = (tally[k] || 0) + 1; });
+          var best = 'oso', bc = -1;
+          ['oso', 'leon', 'lobo', 'delfin'].forEach(function (k) { if ((tally[k] || 0) > bc) { bc = tally[k] || 0; best = k; } });
+          S.quizDone = true; S.chrono = best;
+        } else S.quizStep++;
+        save();
+        renderQuiz(); renderResults(); renderPlan();
+      });
+    });
+  } else {
+    var ci = CHRONO[S.chrono];
+    box.innerHTML = '<div style="background:rgba(245,239,226,0.045);border:1px solid rgba(244,169,80,0.4);border-radius:18px;padding:30px 28px;display:flex;flex-direction:column;gap:12px">' +
+      '<span style="font-size:44px;line-height:1">' + ci.emoji + '</span>' +
+      '<h3 style="font-family:\'Fraunces\',serif;font-size:28px;font-weight:500;margin:0">Eres ' + ci.name + '</h3>' +
+      '<p style="color:#B7BADF;font-size:16px;line-height:1.55;margin:0;font-weight:300">' + ci.desc + '</p>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:6px">' +
+      '<div style="flex:1;min-width:200px;background:rgba(16,20,48,0.6);border:1px solid rgba(139,143,199,0.25);border-radius:12px;padding:14px 16px"><span style="font-size:12px;color:#8B8FC7;letter-spacing:0.5px;text-transform:uppercase;display:block;margin-bottom:4px">Ventana ideal de sueño</span><span style="font-family:\'Fraunces\',serif;font-size:22px;font-variant-numeric:tabular-nums">' + ci.sleep + '</span></div>' +
+      '<div style="flex:1;min-width:200px;background:rgba(16,20,48,0.6);border:1px solid rgba(139,143,199,0.25);border-radius:12px;padding:14px 16px"><span style="font-size:12px;color:#8B8FC7;letter-spacing:0.5px;text-transform:uppercase;display:block;margin-bottom:4px">Pico de productividad</span><span style="font-family:\'Fraunces\',serif;font-size:22px;font-variant-numeric:tabular-nums">' + ci.prod + '</span></div>' +
+      '</div>' +
+      '<p style="color:#F4A950;font-size:14.5px;line-height:1.5;margin:6px 0 0">' + ci.tip + '</p>' +
+      '<button id="quiz-restart" class="btn-ghost" style="align-self:flex-start;margin-top:8px">Repetir el test</button></div>';
+    $('quiz-restart').addEventListener('click', function () {
+      S.quizStep = 0; S.quizAnswers = []; S.quizDone = false; S.chrono = null;
+      save();
+      renderQuiz(); renderResults(); renderPlan();
+    });
+  }
+}
+
+// ---------- deuda de sueño ----------
+var DAYS = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+
+function buildDebtInputs() {
+  $('debt-inputs').innerHTML = DAYS.map(function (name, i) {
+    return '<label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#8B8FC7;align-items:center">' + name +
+      '<input class="debt-input" type="number" min="0" max="14" step="0.5" value="' + S.debtHours[i] + '" data-i="' + i + '"></label>';
+  }).join('') +
+    '<label style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:#F4A950;align-items:center;margin-left:8px">Meta (h)' +
+    '<input id="debt-goal" class="debt-input" type="number" min="4" max="12" step="0.5" value="' + S.debtGoal + '" style="background:rgba(244,169,80,0.1);border-color:rgba(244,169,80,0.5);color:#F4A950"></label>';
+
+  $('debt-bars').innerHTML = DAYS.map(function (_, i) {
+    return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;justify-content:flex-end;height:100%">' +
+      '<span id="debt-val-' + i + '" style="font-size:11px;color:#8B8FC7;font-variant-numeric:tabular-nums"></span>' +
+      '<div id="debt-bar-' + i + '" class="debt-bar"></div></div>';
+  }).join('');
+  $('debt-labels').innerHTML = DAYS.map(function (name) {
+    return '<span style="flex:1;text-align:center;font-size:12px;color:#8B8FC7">' + name + '</span>';
+  }).join('');
+
+  Array.prototype.forEach.call($('debt-inputs').querySelectorAll('input[data-i]'), function (inp) {
+    inp.addEventListener('input', function () {
+      var v = Math.max(0, Math.min(14, Number(inp.value) || 0));
+      S.debtHours[Number(inp.dataset.i)] = v;
+      save(); renderDebt();
+    });
+  });
+  $('debt-goal').addEventListener('input', function () {
+    S.debtGoal = Math.max(4, Math.min(12, Number(this.value) || 8));
+    save(); renderDebt();
+  });
+}
+
+function renderDebt() {
+  var debtMin = 0;
+  DAYS.forEach(function (_, i) {
+    var val = S.debtHours[i];
+    debtMin += Math.max(0, S.debtGoal - val) * 60;
+    $('debt-val-' + i).textContent = val;
+    var bar = $('debt-bar-' + i);
+    bar.style.height = Math.round(Math.min(1, val / 12) * 132) + 'px';
+    bar.style.background = val >= S.debtGoal ? '#9DBA8F' : '#F4A950';
+  });
+  $('debt-goal-line').style.bottom = Math.round(Math.min(1, S.debtGoal / 12) * 132) + 'px';
+  var headline, verdict;
+  if (debtMin === 0) { headline = 'Sin deuda.'; verdict = 'Vas al día con tu meta. El siguiente nivel no es dormir más, sino dormir a la misma hora.'; }
+  else if (debtMin <= 180) { headline = 'Debes ' + durLabel(debtMin) + '.'; verdict = 'Deuda ligera: recuperable con 30 minutos extra un par de noches. No la dejes crecer.'; }
+  else if (debtMin <= 480) { headline = 'Debes ' + durLabel(debtMin) + '.'; verdict = 'No se "paga" en un fin de semana — dormir 11 horas el sábado solo desplaza tu reloj. Recupérala con 30–60 min extra por noche.'; }
+  else { headline = 'Debes ' + durLabel(debtMin) + '.'; verdict = 'Deuda seria. Esta semana tu prioridad es dormir: adelanta la hora de acostarte 45–60 min cada noche y recorta lo que haga falta.'; }
+  $('debt-headline').textContent = headline;
+  $('debt-verdict').textContent = verdict;
+}
+
+// ---------- todo lo que depende de la calculadora ----------
+function renderCalc() {
+  renderResults(); renderArc(); renderPlan(); renderBackground(); renderCountdown(); renderNaps();
+  save();
+}
+
+// ---------- eventos globales ----------
+$('tab-wake').addEventListener('click', function () { S.mode = 'wake'; S.selected = 0; renderTabs(); renderCalc(); });
+$('tab-now').addEventListener('click', function () { S.mode = 'now'; S.selected = 0; renderTabs(); renderCalc(); });
+$('in-wake').addEventListener('change', function () { if (this.value) S.wakeTime = this.value; renderCalc(); });
+$('in-bed').addEventListener('change', function () { if (this.value) S.bedTime = this.value; renderCalc(); });
+$('btn-bed-now').addEventListener('click', function () { S.bedTime = nowHM(); $('in-bed').value = S.bedTime; renderCalc(); });
+$('in-latency').addEventListener('input', function () {
+  S.latency = Number(this.value);
+  $('latency-val').textContent = S.latency + ' min';
+  renderCalc();
+});
+$('in-cyc').addEventListener('input', function () {
+  S.cyc = Number(this.value);
+  $('cyc-val').textContent = S.cyc + ' min';
+  renderCalc();
+});
+$('btn-nap-now').addEventListener('click', function () { S.napAt = nowHM(); renderNaps(); });
+$('btn-copy-plan').addEventListener('click', function () { copyPlan(this); });
+$('btn-plan-ics').addEventListener('click', function () { downloadIcs(selBedMin(), 'Hora de dormir'); });
+$('btn-debt-reset').addEventListener('click', function () {
+  S.debtHours = [S.debtGoal, S.debtGoal, S.debtGoal, S.debtGoal, S.debtGoal, S.debtGoal, S.debtGoal];
+  save(); buildDebtInputs(); renderDebt();
+});
+
+// ---------- init ----------
+loadSaved();
+S.bedTime = nowHM(); S.napAt = S.bedTime;
+$('in-bed').value = S.bedTime;
+$('in-wake').value = S.wakeTime;
+$('in-latency').value = S.latency;
+$('latency-val').textContent = S.latency + ' min';
+$('in-cyc').value = S.cyc;
+$('cyc-val').textContent = S.cyc + ' min';
+renderTabs(); renderAge(); renderFmt(); renderQuiz(); buildDebtInputs(); renderDebt(); renderCalc();
+setInterval(renderCountdown, 30000);
+
+})();
+</script>
+</body>
+</html>

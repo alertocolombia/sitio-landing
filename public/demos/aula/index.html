@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Aula — Demo conceptual de Sitio</title>
+  <meta name="description" content="Demo conceptual de una evaluación actitudinal para docentes creada por Sitio.">
+  <style>
+    :root{--green:#72b842;--ink:#1d2920;--paper:#f2efe6;--line:#cbd1c5;--muted:#667063}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:Arial,sans-serif}.demo{position:fixed;z-index:20;inset:0 0 auto;background:#0057ff;color:#fff;padding:9px 16px;text-align:center;font:600 10px/1.2 monospace;letter-spacing:.12em}.app{display:grid;min-height:100svh;grid-template-columns:220px 1fr;padding-top:30px}.side{display:flex;flex-direction:column;padding:38px 26px;background:var(--ink);color:#dce6d1}.logo{font-size:26px;font-weight:800}.logo span{color:var(--green)}.course{margin:48px 0 26px;color:#82907f;font:10px/1.4 monospace;letter-spacing:.12em}.side nav{display:flex;flex-direction:column;gap:10px}.side nav a{padding:12px;color:#8f9b8c;text-decoration:none;font-size:13px}.side nav a.active{border-left:2px solid var(--green);color:#fff}.back{margin-top:auto;color:#91a18f;text-decoration:none;font:10px/1.3 monospace}.main{padding:clamp(42px,7vw,90px)}.top{display:flex;align-items:flex-start;justify-content:space-between;gap:30px;padding-bottom:30px;border-bottom:1px solid var(--line)}.eyebrow{font:600 10px/1.4 monospace;letter-spacing:.14em;color:var(--muted)}h1{margin:14px 0 0;font-size:clamp(40px,5vw,76px);line-height:.93;letter-spacing:-.055em}.student{min-width:210px}.student label{display:block;margin-bottom:8px;font:600 10px/1.4 monospace;letter-spacing:.1em}.student select{width:100%;border:1px solid var(--line);border-radius:8px;background:transparent;padding:12px}.grid{display:grid;grid-template-columns:1.25fr .75fr;gap:48px;margin-top:42px}.criteria{border-top:1px solid var(--line)}.criterion{display:grid;grid-template-columns:1fr 200px 34px;align-items:center;gap:20px;padding:24px 0;border-bottom:1px solid var(--line)}.criterion label{font-weight:700}.criterion small{display:block;margin-top:5px;color:var(--muted);font-weight:400}.criterion output{font-size:20px;font-weight:800;text-align:right}input[type=range]{width:100%;accent-color:var(--green)}.summary{align-self:start;padding:28px;border:1px solid var(--line);border-radius:14px;background:#faf8f1}.summary h2{margin:0;font-size:14px}.score{margin:26px 0 4px;font-size:82px;font-weight:800;line-height:.8;letter-spacing:-.06em}.state{color:#4d6b3b;font:600 10px/1.4 monospace;letter-spacing:.1em}.bar{height:6px;margin-top:24px;background:#dce0d7}.bar span{display:block;width:84%;height:100%;background:var(--green);transition:width .2s}.summary p{margin-top:24px;color:var(--muted);font-size:13px;line-height:1.55}textarea{width:100%;min-height:100px;margin-top:20px;border:1px solid var(--line);border-radius:8px;background:transparent;padding:12px;resize:vertical}button{width:100%;margin-top:14px;border:0;border-radius:9px;background:var(--ink);color:#fff;padding:15px;font-weight:700;cursor:pointer}.saved{min-height:18px;margin:12px 0 0!important;color:#4d6b3b!important;text-align:center;font:600 10px/1.4 monospace!important;letter-spacing:.08em}
+    @media(max-width:850px){.app{grid-template-columns:1fr}.side{display:none}.main{padding:48px 22px}.top,.grid{display:block}.student{margin-top:28px}.summary{margin-top:40px}.criterion{grid-template-columns:1fr 120px 28px}}
+  </style>
+</head>
+<body>
+  <div class="demo">DEMO CONCEPTUAL · DATOS FICTICIOS</div>
+  <main class="app">
+    <aside class="side"><div class="logo">Aula<span>●</span></div><p class="course">CURSO 8B · PERIODO 02</p><nav><a href="#">Resumen</a><a class="active" href="#">Evaluación</a><a href="#">Seguimiento</a></nav><a class="back" href="/">← VOLVER A SITIO</a></aside>
+    <section class="main">
+      <header class="top">
+        <div><p class="eyebrow">EVALUACIÓN ACTITUDINAL</p><h1>Una lectura clara<br>del proceso.</h1></div>
+        <div class="student"><label for="student">ESTUDIANTE</label><select id="student"><option>Mariana Torres</option><option>Sebastián Díaz</option><option>Lucía Castro</option></select></div>
+      </header>
+      <div class="grid">
+        <form id="evaluation" class="criteria">
+          <div class="criterion"><label for="participacion">Participación<small>Aporta y escucha al grupo.</small></label><input id="participacion" type="range" min="1" max="5" step=".1" value="4.4"><output>4.4</output></div>
+          <div class="criterion"><label for="equipo">Trabajo en equipo<small>Construye con otros.</small></label><input id="equipo" type="range" min="1" max="5" step=".1" value="4.0"><output>4.0</output></div>
+          <div class="criterion"><label for="autonomia">Autonomía<small>Inicia y termina sus tareas.</small></label><input id="autonomia" type="range" min="1" max="5" step=".1" value="4.2"><output>4.2</output></div>
+          <div class="criterion"><label for="cuidado">Cuidado del entorno<small>Respeta acuerdos y espacios.</small></label><input id="cuidado" type="range" min="1" max="5" step=".1" value="4.3"><output>4.3</output></div>
+        </form>
+        <aside class="summary"><h2>Resultado del periodo</h2><div class="score" id="score">4.2</div><div class="state" id="state">PROCESO CONSISTENTE</div><div class="bar"><span id="bar"></span></div><p>El resultado resume los criterios; el comentario conserva el contexto que una cifra no puede explicar.</p><label class="eyebrow" for="note">NOTA DEL DOCENTE</label><textarea id="note" placeholder="Escriba una observación breve…"></textarea><button id="save" type="button">Guardar evaluación</button><p class="saved" id="saved" aria-live="polite"></p></aside>
+      </div>
+    </section>
+  </main>
+  <script>
+    const sliders=[...document.querySelectorAll('input[type=range]')];const score=document.querySelector('#score'),bar=document.querySelector('#bar'),state=document.querySelector('#state');
+    function update(){sliders.forEach(s=>s.nextElementSibling.value=Number(s.value).toFixed(1));const avg=sliders.reduce((a,s)=>a+Number(s.value),0)/sliders.length;score.textContent=avg.toFixed(1);bar.style.width=(avg/5*100)+'%';state.textContent=avg>=4?'PROCESO CONSISTENTE':avg>=3?'EN DESARROLLO':'REQUIERE ACOMPAÑAMIENTO'}
+    sliders.forEach(s=>s.addEventListener('input',update));document.querySelector('#save').addEventListener('click',()=>{const name=document.querySelector('#student').value;document.querySelector('#saved').textContent='EVALUACIÓN DE '+name.toUpperCase()+' GUARDADA';setTimeout(()=>document.querySelector('#saved').textContent='',2600)});update();
+  </script>
+</body>
+</html>

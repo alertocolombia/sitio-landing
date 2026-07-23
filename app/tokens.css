@@ -1,0 +1,43 @@
+/*
+ * SITIO · sistema de espaciado
+ * Única escala permitida: 4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 / 96 / 128 px.
+ * Los valores fluidos usan exclusivamente extremos de esta escala.
+ */
+:root {
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-48: 48px;
+  --space-64: 64px;
+  --space-96: 96px;
+  --space-128: 128px;
+
+  /* Ritmo compartido: label → título → cuerpo → tarjetas. */
+  --card-pad: clamp(var(--space-24), 4vw, var(--space-64));
+  --section-pad: clamp(var(--space-64), 8vw, var(--space-128));
+  --grid-gap: clamp(var(--space-32), 6vw, var(--space-96));
+  --flow-label-heading: var(--space-24);
+  --flow-heading-body: var(--space-24);
+  --flow-body-cards: clamp(var(--space-48), 7vw, var(--space-96));
+  --card-gap: var(--space-16);
+}
+
+/* Tailwind v4: p-token-*, gap-card, p-card y py-section. */
+@theme inline {
+  --spacing-token-4: var(--space-4);
+  --spacing-token-8: var(--space-8);
+  --spacing-token-12: var(--space-12);
+  --spacing-token-16: var(--space-16);
+  --spacing-token-24: var(--space-24);
+  --spacing-token-32: var(--space-32);
+  --spacing-token-48: var(--space-48);
+  --spacing-token-64: var(--space-64);
+  --spacing-token-96: var(--space-96);
+  --spacing-token-128: var(--space-128);
+  --spacing-card: var(--card-pad);
+  --spacing-section: var(--section-pad);
+  --spacing-grid: var(--grid-gap);
+}

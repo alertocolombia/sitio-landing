@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Script Node (CommonJS) de vectorización de logos
+    "scripts/**",
   ]),
 ]);
 
