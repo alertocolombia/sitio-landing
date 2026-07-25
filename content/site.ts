@@ -231,6 +231,14 @@ export const pricing = [
   },
 ] as const;
 
+/*
+ * Alerto SE QUEDA en el portafolio (decidido el 23 jul 2026).
+ * La auditoría del 22 de julio pedía retirarlo por una supuesta instrucción
+ * expresa, pero el meta-prompt del 21 de julio —que manda cuando hay
+ * contradicción— lo lista como proyecto real a mostrar. Además es producto
+ * propio (sin permisos de terceros) y es la única prueba del sector salud,
+ * que la landing sí vende. Aquí queda zanjado para no volver sobre el tema.
+ */
 export const projects = [
   {
     name: "Aula · Valora",
@@ -325,6 +333,11 @@ export const faqs = [
       "Una página express parte de $350.000 COP y una tienda en línea parte de $3.500.000 COP. Una página más amplia o una herramienta a la medida se cotiza según alcance; el precio queda cerrado antes de construir.",
   },
   {
+    question: "¿Cómo se paga?",
+    answer:
+      "En dos partes: la mitad para empezar y la otra mitad cuando apruebas el resultado, antes de publicar. La Página Express, por su valor, se puede pagar completa al inicio. Todo queda por escrito antes de arrancar.",
+  },
+  {
     question: "¿De verdad pueden entregar una página en 48 horas?",
     answer:
       "Sí, cuando es una Página Express y el contenido está listo. Las páginas más amplias, tiendas y herramientas tienen un cronograma propio porque requieren más decisiones y conexiones.",
@@ -345,6 +358,16 @@ export const faqs = [
       "Sí. El dominio y las cuentas principales deben quedar bajo control del negocio. También explicamos qué se paga cada año y qué necesita mantenimiento.",
   },
   {
+    question: "¿Cuántos ajustes puedo pedir?",
+    answer:
+      "La Página Express incluye una ronda de ajustes y las páginas más grandes incluyen dos. Una ronda es una lista de cambios junta, no correcciones sueltas una por una. Si necesitas más, se cotizan antes de hacerlos, nunca después.",
+  },
+  {
+    question: "¿Qué pasa después de publicar?",
+    answer:
+      "Durante los primeros 30 días corregimos sin costo cualquier error o falla de la página. Los contenidos nuevos —agregar productos, secciones o campañas— se cotizan aparte, y te explicamos cómo hacer los ajustes del día a día por tu cuenta.",
+  },
+  {
     question: "¿Qué significa que esté optimizada para vender?",
     answer:
       "Que el mensaje, el orden, la velocidad y las llamadas a la acción trabajan juntos para acercar a la persona a una compra, contacto, reserva o registro. No prometemos ventas sin tráfico ni oferta; construimos una mejor ruta para convertirlos.",
@@ -359,17 +382,19 @@ export const faqs = [
 /*
  * Datos que la conversión todavía necesita. No se publican hasta confirmarlos.
  * Mantenerlos aquí evita rellenar la landing con promesas o pruebas inventadas.
+ *
+ * Confirmado el 23 jul 2026 (ya reflejado en las FAQ):
+ * - Pago: 50% para empezar, 50% al aprobar antes de publicar; Express admite 100% al inicio.
+ * - Ajustes: 1 ronda en Express, 2 en planes mayores.
+ * - Post-publicación: 30 días de corrección de errores sin costo.
+ * - Descuentos: precio de referencia permanente, sin fecha de vencimiento.
+ * Política interna (NO publicada en la web): si el cliente desiste tras ver la
+ * propuesta, se reembolsa el 50% del anticipo y se retiene el 50% que cubre el trabajo.
  */
 export const conversionPending = [
-  "{{PENDIENTE}} ¿Cómo se paga cada plan y cuánto se entrega para empezar?",
-  "{{PENDIENTE}} ¿Cuántas rondas de cambios incluye cada plan?",
-  "{{PENDIENTE}} ¿Qué pasa si al cliente no le gusta la primera propuesta?",
-  "{{PENDIENTE}} ¿Qué acompañamiento recibe después de publicar y durante cuánto tiempo?",
   "{{PENDIENTE}} ¿Qué mantenimiento necesita cada tipo de página y cuánto puede costar?",
-  "{{PENDIENTE}} ¿Qué debe entregar el cliente para iniciar: textos, fotos, logo, accesos u otros materiales?",
   "{{PENDIENTE}} ¿Cuánto tarda normalmente cada plan, además del Express desde 48 horas?",
   "{{PENDIENTE}} ¿Qué puede editar el cliente por su cuenta en cada plan?",
   "{{PENDIENTE}} ¿Qué accesos se entregan al cerrar el proyecto y a nombre de quién queda cada cuenta?",
   "{{PENDIENTE}} ¿Qué casos tienen permiso para publicar, resultados medibles y testimonios verificables?",
-  "{{PENDIENTE}} ¿Hasta cuándo son válidos los precios y descuentos actuales?",
 ] as const;

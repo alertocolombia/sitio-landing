@@ -80,11 +80,11 @@ export default function SiteLanding() {
 
             <ol className="process-list">
               {process.map((step, index) => (
-                <Reveal key={step.title} delay={index * 0.045}>
-                  <li>
+                <li key={step.title}>
+                  <Reveal delay={index * 0.045}>
                     <div><h3>{step.title}</h3><p>{step.text}</p></div>
-                  </li>
-                </Reveal>
+                  </Reveal>
+                </li>
               ))}
             </ol>
           </div>

@@ -7,7 +7,7 @@ export default function WorkRail() {
     <section id="trabajos" className="work-section">
       <div className="work-heading site-shell">
         <Reveal>
-          <h2>Mira nuestros proyectos. <span className="no-orphan">Puedes abrirlos.</span></h2>
+          <h2>No solo se ven bien. <span className="no-orphan">Puedes abrirlos.</span></h2>
         </Reveal>
       </div>
 

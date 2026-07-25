@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Geist, Plus_Jakarta_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
-import { site } from "@/content/site";
+import { site, faqs } from "@/content/site";
 import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({
@@ -54,9 +54,9 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/og.png",
-        width: 1730,
-        height: 909,
+        url: "/og.jpg",
+        width: 1200,
+        height: 630,
         alt: "Sitio — Páginas que venden. Diseño y desarrollo web en Colombia.",
       },
     ],
@@ -65,7 +65,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Sitio — Páginas que venden.",
     description: "Tú vendes. Nosotros resolvemos tu página para que las personas puedan escribirte, reservar o comprar.",
-    images: ["/og.png"],
+    images: ["/og.jpg"],
   },
   robots: {
     index: true,
@@ -108,16 +108,51 @@ const organization = {
   },
 };
 
+const professionalService = {
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  name: "Sitio",
+  url: site.url,
+  description: site.description,
+  image: `${site.url}/og.jpg`,
+  telephone: site.phone,
+  email: site.email,
+  priceRange: "$350.000 - $3.500.000 COP",
+  areaServed: {
+    "@type": "Country",
+    name: "Colombia",
+  },
+  sameAs: [site.instagramUrl],
+};
+
+const faqPage = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((item) => ({
+    "@type": "Question",
+    name: item.question,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: item.answer,
+    },
+  })),
+};
+
+const structuredData = [organization, professionalService, faqPage];
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es-CO" className={`${bricolage.variable} ${geist.variable} ${plusJakarta.variable}`}>
       <body>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(organization).replace(/</g, "\\u003c"),
-          }}
-        />
+        {structuredData.map((schema, index) => (
+          <script
+            key={index}
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(schema).replace(/</g, "\\u003c"),
+            }}
+          />
+        ))}
         {children}
         <Analytics />
       </body>

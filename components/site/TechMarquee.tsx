@@ -30,6 +30,7 @@ function TechnologyGroup({ duplicate = false }: { duplicate?: boolean }) {
           <span className="tech-marquee__unit" key={technology.name}>
             <span
               className="tech-marquee__brand"
+              role="img"
               aria-label={technology.name}
             >
             {"icon" in technology ? (

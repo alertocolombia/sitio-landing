@@ -81,7 +81,7 @@ export default function Hero() {
               <a className="site-text-link" href="#precios">Ver precios <span>↓</span></a>
             </div>
             <small className="hero-cta-note">
-              Se abre WhatsApp. Cuéntanos qué vendes; no tienes que decidir nada todavía.
+              Se abre WhatsApp con un mensaje guía. Responder no te compromete a nada.
             </small>
           </motion.aside>
         </div>
