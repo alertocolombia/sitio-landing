@@ -1,4 +1,4 @@
-import Reveal from "./Reveal";
+import Reveal from "@/components/site/Reveal";
 
 type Props = {
   eyebrow: string;

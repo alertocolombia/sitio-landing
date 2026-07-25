@@ -41,6 +41,7 @@ export default function SectorRail() {
 
   useEffect(() => {
     if (reducedMotion) return;
+    if (window.matchMedia("(pointer: coarse)").matches) return;
 
     const viewport = viewportRef.current;
     const group = firstGroupRef.current;

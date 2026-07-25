@@ -90,6 +90,24 @@ a {
   margin-inline: auto;
 }
 
+.site-reveal {
+  opacity: 1;
+  transform: none;
+}
+
+.site-reveal--ready {
+  opacity: 0;
+  transform: translateY(28px);
+}
+
+.site-reveal--ready.is-visible {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 700ms cubic-bezier(0.22, 0.72, 0.24, 1),
+    transform 700ms cubic-bezier(0.22, 0.72, 0.24, 1);
+}
+
 main > section[id] {
   scroll-margin-top: var(--space-96);
 }
@@ -123,20 +141,9 @@ main > section[id] {
   transition: transform 180ms ease, background-color 180ms ease, color 180ms ease;
 }
 
-.site-button:hover {
-  transform: translateY(-2px);
-  background: var(--site-ink);
-  border-color: var(--site-ink);
-}
-
 .site-button span,
 .site-text-link span {
   transition: transform 180ms ease;
-}
-
-.site-button:hover span,
-.site-text-link:hover span {
-  transform: translate(2px, -2px);
 }
 
 .site-button--small {
@@ -149,12 +156,6 @@ main > section[id] {
   background: white;
   border-color: white;
   color: var(--site-blue);
-}
-
-.site-button--inverse:hover {
-  background: var(--site-ink);
-  border-color: var(--site-ink);
-  color: white;
 }
 
 .site-text-link {
@@ -207,10 +208,6 @@ main > section[id] {
 
 .site-nav__links a {
   transition: color 160ms ease;
-}
-
-.site-nav__links a:hover {
-  color: var(--site-blue);
 }
 
 .site-nav__inner > .site-button {
@@ -441,10 +438,6 @@ main > section[id] {
   transition: transform 220ms ease;
 }
 
-.tech-marquee__brand:hover {
-  transform: scale(1.08);
-}
-
 .tech-marquee__brand svg {
   width: var(--space-48);
   height: var(--space-48);
@@ -605,11 +598,6 @@ main > section[id] {
   transition: transform 260ms ease, border-color 260ms ease;
 }
 
-.work-card:hover {
-  border-color: rgba(141, 170, 255, 0.55);
-  transform: translateY(-4px);
-}
-
 .work-track > :nth-child(even) .work-card {
   grid-template-columns: minmax(300px, 0.7fr) minmax(0, 1.65fr);
 }
@@ -685,11 +673,6 @@ main > section[id] {
   font-size: 0.88rem;
   font-weight: 640;
   transition: color 180ms ease, border-color 180ms ease;
-}
-
-.work-card__copy > a:hover {
-  color: #8daaff;
-  border-color: #8daaff;
 }
 
 .project-visual {
@@ -860,10 +843,6 @@ main > section[id] {
   height: 200%;
   transform: scale(0.5);
   transform-origin: top left;
-}
-
-.work-card:hover .project-preview__frame {
-  box-shadow: 0 40px 112px rgba(0, 0, 0, 0.34);
 }
 
 /* Case studies */
@@ -1139,19 +1118,14 @@ main > section[id] {
   transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
 }
 
-.sector-carousel__controls button:hover {
-  border-color: var(--site-blue);
-  background: var(--site-blue);
-  color: white;
-  transform: translateY(-2px);
-}
-
 .sector-carousel__viewport {
   width: 100%;
   min-width: 0;
   overflow-x: auto;
   overscroll-behavior-inline: contain;
   scrollbar-width: none;
+  touch-action: pan-x pan-y;
+  -webkit-overflow-scrolling: touch;
   cursor: grab;
 }
 
@@ -1167,7 +1141,7 @@ main > section[id] {
   display: flex;
   width: max-content;
   gap: var(--space-16);
-  padding-inline: max(var(--space-24), calc((100vw - var(--site-shell)) / 2));
+  padding-inline: max(var(--space-24), calc((100dvw - var(--site-shell)) / 2));
   padding-bottom: var(--space-32);
 }
 
@@ -1192,9 +1166,14 @@ main > section[id] {
   transition: transform 220ms ease, box-shadow 220ms ease;
 }
 
-.sector-card:hover {
-  box-shadow: 0 24px 70px rgba(21, 20, 18, 0.12);
-  transform: translateY(-4px);
+@media (pointer: coarse) {
+  .sector-carousel__viewport {
+    scroll-snap-type: x mandatory;
+  }
+
+  .sector-card {
+    scroll-snap-align: start;
+  }
 }
 
 .sector-card--health {
@@ -1291,10 +1270,6 @@ main > section[id] {
   transition: transform 180ms ease;
 }
 
-.sector-card > a:hover span {
-  transform: translate(3px, -3px);
-}
-
 .sector-card--commerce > p {
   color: inherit;
   opacity: 0.78;
@@ -1380,11 +1355,6 @@ main > section[id] {
   border-radius: 22px;
   background: var(--site-bone);
   transition: border-color 220ms ease, box-shadow 220ms ease;
-}
-
-.price-card:hover {
-  border-color: rgba(0, 87, 255, 0.52);
-  box-shadow: 0 28px 80px rgba(21, 20, 18, 0.12);
 }
 
 .price-card--featured {
@@ -1892,8 +1862,74 @@ main > section[id] {
   transition: color 180ms ease, border-color 180ms ease;
 }
 
-.final-action > a:hover { color: #8daaff; border-color: #8daaff; }
 .final-action p { margin: var(--space-16) 0 0; color: #8f8a81; font-family: var(--font-label), sans-serif; font-size: 0.66rem; line-height: 1.5; }
+
+@media (hover: hover) and (pointer: fine) {
+  .site-button:hover {
+    transform: translateY(-2px);
+    background: var(--site-ink);
+    border-color: var(--site-ink);
+  }
+
+  .site-button:hover span,
+  .site-text-link:hover span {
+    transform: translate(2px, -2px);
+  }
+
+  .site-button--inverse:hover {
+    background: var(--site-ink);
+    border-color: var(--site-ink);
+    color: white;
+  }
+
+  .site-nav__links a:hover {
+    color: var(--site-blue);
+  }
+
+  .tech-marquee__brand:hover {
+    transform: scale(1.08);
+  }
+
+  .work-card:hover {
+    border-color: rgba(141, 170, 255, 0.55);
+    transform: translateY(-4px);
+  }
+
+  .work-card__copy > a:hover {
+    color: #8daaff;
+    border-color: #8daaff;
+  }
+
+  .work-card:hover .project-preview__frame {
+    box-shadow: 0 40px 112px rgba(0, 0, 0, 0.34);
+  }
+
+  .sector-carousel__controls button:hover {
+    border-color: var(--site-blue);
+    background: var(--site-blue);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  .sector-card:hover {
+    box-shadow: 0 24px 70px rgba(21, 20, 18, 0.12);
+    transform: translateY(-4px);
+  }
+
+  .sector-card > a:hover span {
+    transform: translate(3px, -3px);
+  }
+
+  .price-card:hover {
+    border-color: rgba(0, 87, 255, 0.52);
+    box-shadow: 0 28px 80px rgba(21, 20, 18, 0.12);
+  }
+
+  .final-action > a:hover {
+    color: #8daaff;
+    border-color: #8daaff;
+  }
+}
 
 /* Footer */
 .site-footer {

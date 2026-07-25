@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { useReducedMotion } from "framer-motion";
+import { useLayoutEffect, useRef } from "react";
 import type { ReactNode } from "react";
 
 export default function Reveal({
@@ -12,23 +13,43 @@ export default function Reveal({
   className?: string;
   delay?: number;
 }) {
-  const reduced = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const reducedMotion = useReducedMotion();
 
-  if (reduced) return <div className={className}>{children}</div>;
+  useLayoutEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    element.classList.remove("site-reveal--ready", "is-visible");
+
+    if (reducedMotion || !("IntersectionObserver" in window)) return;
+
+    const bounds = element.getBoundingClientRect();
+    const startsInView = bounds.bottom >= 0 && bounds.top <= window.innerHeight * 0.88;
+    if (startsInView) return;
+
+    element.classList.add("site-reveal--ready");
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        element.classList.add("is-visible");
+        observer.disconnect();
+      },
+      { rootMargin: "0px 0px -12% 0px" },
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [reducedMotion]);
 
   return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y: 28 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "0px 0px -12% 0px" }}
-      transition={{
-        duration: 0.7,
-        delay,
-        ease: [0.22, 0.72, 0.24, 1],
-      }}
+    <div
+      ref={ref}
+      className={`site-reveal${className ? ` ${className}` : ""}`}
+      style={{ transitionDelay: `${delay}s` }}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }
