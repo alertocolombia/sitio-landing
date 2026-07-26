@@ -226,6 +226,19 @@ main > section[id] {
   padding-top: var(--space-64);
   overflow: hidden;
   border-bottom: 1px solid var(--site-line);
+
+  /* Entrada del hero: cortina de línea. Cuatro registros distintos a propósito
+     (sube / enfoca / se descubre hacia abajo / barre en horizontal) para que no
+     lea como una sola deriva uniforme. Cero opacity: Chrome descarta como
+     candidatos LCP los elementos con opacity 0. */
+  --hero-dur: 780ms;
+  --hero-step: 70ms;
+  --hero-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Sangrado del recorte. Bricolage con line-height 0.85 desborda su caja de
+     línea ~0.175em por lado (ascent .930em / descent .270em, derivados del
+     @font-face de next/font). Sin esto se recorta la tilde de "Tú" y las
+     descendentes de "página". */
+  --hero-bleed: 0.2em;
 }
 
 .coordinate-grid {
@@ -259,15 +272,6 @@ main > section[id] {
   height: 100%;
 }
 
-.coordinate-grid__label {
-  position: absolute;
-  top: 19%;
-  right: 4%;
-  font-family: var(--font-label), sans-serif;
-  font-size: 0.62rem;
-  letter-spacing: 0.14em;
-  color: var(--site-blue);
-}
 
 .hero-layout {
   position: relative;
@@ -279,6 +283,13 @@ main > section[id] {
 
 .hero-layout > .site-eyebrow {
   color: var(--site-blue);
+  /* Registro 4: barrido horizontal, como un rótulo de ficha técnica. */
+  animation: hero-wipe-x 620ms var(--hero-ease) backwards;
+}
+
+@keyframes hero-wipe-x {
+  from { clip-path: inset(-0.4em 100% -0.4em -0.08em); }
+  to { clip-path: inset(-0.4em -0.08em -0.4em -0.08em); }
 }
 
 .hero-content {
@@ -317,15 +328,53 @@ main > section[id] {
   line-height: 0.85;
 }
 
+/* clip-path en vez de overflow:hidden a propósito: no altera el layout, así que
+   no hace falta el truco de padding + margen negativo compensatorio. */
 .hero-content h1 > span {
   display: block;
   width: max-content;
   max-width: 100%;
+  clip-path: inset(calc(var(--hero-bleed) * -1) -0.08em);
+}
+
+/* Registro 1: cada línea sube desde detrás del borde de recorte.
+   `backwards` y no `both`: al terminar vuelve al estilo base y no deja una capa
+   compositada permanente sobre el elemento LCP. */
+.hero-line__inner {
+  display: block;
+  animation: hero-line-rise var(--hero-dur) var(--hero-ease) backwards;
+}
+
+.hero-content h1 > span:nth-of-type(2) .hero-line__inner {
+  animation-delay: var(--hero-step);
+}
+
+.hero-content h1 > span:nth-of-type(3) .hero-line__inner {
+  animation-delay: calc(var(--hero-step) * 2);
+}
+
+@keyframes hero-line-rise {
+  from { transform: translate3d(0, calc(100% + var(--hero-bleed)), 0); }
+  to { transform: translate3d(0, 0, 0); }
 }
 
 .hero-cta-panel {
   padding-block: var(--space-32);
   border-block: 1px solid var(--site-line);
+  /* Registro 3: se descubre de arriba abajo, en dirección contraria al titular.
+     `backwards` es obligatorio: con `both` quedaría un clip-path:inset(0)
+     permanente que recortaría el anillo de foco (outline-offset 4px). */
+  animation: hero-panel-wipe 760ms var(--hero-ease) 220ms backwards;
+}
+
+@keyframes hero-panel-wipe {
+  from { clip-path: inset(0 0 100% 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
+/* si alguien tabula al CTA mientras corre, se cancela el recorte */
+.hero-cta-panel:focus-within {
+  animation: none;
 }
 
 .hero-cta-panel > .site-eyebrow {
@@ -379,6 +428,13 @@ main > section[id] {
   font-size: clamp(1.02rem, 1.35vw, 1.25rem);
   font-weight: 620;
   line-height: 1.48;
+  /* Registro 2: entra por enfoque de cámara, no por cortina. */
+  animation: hero-focus 560ms cubic-bezier(0.22, 0.68, 0.24, 1) 120ms backwards;
+}
+
+@keyframes hero-focus {
+  from { filter: blur(7px); transform: translate3d(0, 0.35em, 0); }
+  to { filter: blur(0); transform: translate3d(0, 0, 0); }
 }
 
 /* Technology marquee */
@@ -687,21 +743,25 @@ main > section[id] {
 }
 
 .project-preview--aula {
+  --preview-bg: #ef6545;
   background: #ef6545;
   color: white;
 }
 
 .project-preview--ciclo {
+  --preview-bg: #0b0e24;
   background: #0b0e24;
   color: white;
 }
 
 .project-preview--alerto {
+  --preview-bg: #0d3c37;
   background: #0d3c37;
   color: white;
 }
 
 .project-preview--vigor {
+  --preview-bg: #eadcc9;
   background: #eadcc9;
   color: var(--site-ink);
 }
@@ -768,7 +828,7 @@ main > section[id] {
   padding: var(--space-8) var(--space-12);
   border-bottom: 1px solid rgba(20, 18, 16, 0.12);
   background: #f6f4ef;
-  color: #6d6860;
+  color: #655f57;
 }
 
 .project-preview__bar b,
@@ -831,7 +891,7 @@ main > section[id] {
   width: 100%;
   height: 100%;
   border: 0;
-  background: #0b0e24;
+  background: var(--preview-bg, #f8f7f3);
 }
 
 .project-preview__canvas iframe {
@@ -847,7 +907,7 @@ main > section[id] {
 
 /* Case studies */
 .case-page {
-  min-height: 100vh;
+  min-height: 100svh;
   background: var(--site-bone);
   color: var(--site-ink);
 }
@@ -866,6 +926,7 @@ main > section[id] {
 }
 
 .case-nav > a:last-child {
+  padding-block: var(--space-8);
   font-family: var(--font-label), sans-serif;
   font-size: 0.68rem;
   font-weight: 650;
@@ -986,6 +1047,11 @@ main > section[id] {
   text-transform: uppercase;
 }
 
+.case-page--alerto { --preview-bg: #0d3c37; }
+.case-page--aula { --preview-bg: #ef6545; }
+.case-page--ciclo { --preview-bg: #0b0e24; }
+.case-page--vigor { --preview-bg: #eadcc9; }
+
 .case-page--alerto .case-browser__bar,
 .case-page--alerto .case-hero li {
   border-color: rgba(20, 66, 61, 0.24);
@@ -1010,11 +1076,18 @@ main > section[id] {
   background: #eadcc9;
 }
 
+/* Fotos de producto verticales (1122x1402 = 4:5 exacto). En el carril 16/9 se
+   recortaban al 45% superior. Fuera de media query: el recorte pasaba igual en
+   escritorio. El :not() protege al preview live, cuya altura manda. */
+.case-page--vigor .case-browser__canvas:not(.case-browser__canvas--live) {
+  aspect-ratio: 4 / 5;
+}
+
 .case-browser__canvas--live {
-  height: min(78vh, 860px);
+  height: min(78svh, 860px);
   min-height: 560px;
   aspect-ratio: auto;
-  background: #0b0e24;
+  background: var(--preview-bg, #f8f7f3);
 }
 
 .case-gallery__live-caption {
@@ -1169,10 +1242,20 @@ main > section[id] {
 @media (pointer: coarse) {
   .sector-carousel__viewport {
     scroll-snap-type: x mandatory;
+    /* sin esto el snapport anula el padding-inline del track y las tarjetas
+       aterrizan contra el bisel, mientras el titular arranca en x=19.5 */
+    scroll-padding-inline: max(var(--space-24), calc((100dvw - var(--site-shell)) / 2));
   }
 
   .sector-card {
     scroll-snap-align: start;
+  }
+
+  /* 574px de iframe sobre un shell de 351px dejaban 19.5px por lado para poder
+     seguir bajando: el dedo quedaba atrapado dentro del demo. La salida sigue
+     siendo "Abrir en pantalla completa". */
+  .case-browser__canvas--live iframe {
+    pointer-events: none;
   }
 }
 
@@ -1685,12 +1768,6 @@ main > section[id] {
   border-bottom: 1px solid var(--site-line);
 }
 
-.process-list li > span {
-  font-family: var(--font-label), sans-serif;
-  font-size: 0.68rem;
-  color: var(--site-blue);
-}
-
 .process-list h3 {
   max-width: 18ch;
   margin: 0;
@@ -1864,6 +1941,20 @@ main > section[id] {
 
 .final-action p { margin: var(--space-16) 0 0; color: #8f8a81; font-family: var(--font-label), sans-serif; font-size: 0.66rem; line-height: 1.5; }
 
+/* Realimentación táctil: sin esto ningún enlace responde al dedo, porque
+   -webkit-tap-highlight-color está en transparent y todo el hover vive dentro
+   de la media query de puntero fino. */
+.case-nav > a:active,
+.case-gallery__live-caption > a:active,
+.case-next > a:active,
+.site-button:active,
+.site-text-link:active,
+.sector-card > a:active,
+.work-card__copy > a:active,
+.final-action > a:active {
+  opacity: 0.6;
+}
+
 @media (hover: hover) and (pointer: fine) {
   .site-button:hover {
     transform: translateY(-2px);
@@ -1962,7 +2053,7 @@ main > section[id] {
   .site-nav__inner { grid-template-columns: 1fr auto auto; }
   .site-nav__links { display: none; }
   .site-nav__inner > .site-button { justify-self: end; }
-  .site-menu { display: flex; width: 40px; height: 40px; border: 0; background: transparent; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-8); }
+  .site-menu { display: flex; width: 44px; height: 44px; border: 0; background: transparent; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-8); }
   .site-menu span { width: 20px; height: 1px; background: var(--site-ink); }
   .site-mobile-menu { display: flex; flex-direction: column; border-top: 1px solid var(--site-line); background: var(--site-bone); }
   .site-mobile-menu a { padding: var(--space-16) var(--space-24); border-bottom: 1px solid var(--site-line); font-family: var(--font-label), sans-serif; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; }
@@ -2011,16 +2102,25 @@ main > section[id] {
 
 @media (max-width: 640px) {
   .site-nav--hidden { transform: none; }
-  .site-nav__inner { grid-template-columns: minmax(0, 1fr) auto auto; gap: var(--space-8); }
-  .site-nav__inner > .site-button { display: inline-flex; padding-inline: var(--space-12); white-space: nowrap; }
+  /* 16px de separación: con 8px la hamburguesa quedaba pegada a "Hablemos" y un
+     pulgar desviado abría WhatsApp en vez del menú. */
+  .site-nav__inner { grid-template-columns: minmax(0, 1fr) auto auto; gap: var(--space-16); }
+  .site-nav__inner > .site-button { display: inline-flex; padding-inline: var(--space-12); white-space: nowrap; min-height: 44px; }
+  .site-nav__logo { display: flex; align-items: center; min-height: 44px; }
   .coordinate-grid { background-size: var(--space-64) var(--space-64); }
-  .hero-layout { padding-top: var(--space-64); }
+  /* El orden importa: el titular baja de tamaño (1), el hero sube (2) y sólo
+     entonces el eje azul cae en el hueco entre eyebrow y h1 (3). */
+  .hero-layout { padding-top: var(--space-32); }
   .hero-content { gap: var(--space-48); }
-  .hero-content h1 { min-width: 0; font-size: clamp(2.55rem, 10.6vw, 3.8rem); }
+  .hero-content h1 { min-width: 0; font-size: clamp(1.9rem, 9.4vw, 3.8rem); }
   .hero-content h1 > span { width: auto; }
+  .coordinate-grid__axis--x { top: var(--space-64); }
   .hero-cta-panel { min-width: 0; }
   .hero-promise { font-size: 1rem; }
+  .hero-actions .site-text-link { min-height: 44px; justify-content: flex-start; gap: var(--space-12); }
   .tech-marquee { padding-block: var(--space-24); }
+  /* La máscara de 48px se comía 96 de 351px: sólo 2 de 4 iconos quedaban nítidos. */
+  .tech-marquee__viewport { mask-image: linear-gradient(to right, transparent, black var(--space-24), black calc(100% - var(--space-24)), transparent); }
   .tech-marquee__brand { width: var(--space-48); height: var(--space-48); }
   .tech-marquee__brand svg { width: var(--space-32); height: var(--space-32); }
   .tech-marquee__label { margin-bottom: var(--space-16); }
@@ -2034,26 +2134,62 @@ main > section[id] {
   .sector-card { width: 86vw; min-height: 520px; }
   .sector-card h3 { margin-top: var(--space-48); }
   .sector-card ul { padding-top: var(--space-48); }
-  .work-card__visual,
-  .project-visual { min-height: 390px; }
+  /* .project-visual sale del grupo: con el canvas 3/4 y los frames apilados el
+     alto crece, y un min-height fijo lo recortaba contra su overflow:hidden.
+     Su regla base (min-height: 520px) queda de suelo. */
+  .work-card__visual { min-height: 390px; }
   .work-card__copy { min-height: 390px; }
-  .project-visual { padding: var(--space-16); }
+  .project-visual { padding: var(--space-16) var(--space-16) var(--space-32); }
   .project-preview__signature { align-items: flex-start; }
-  .project-preview__frame--primary { width: 94%; }
-  .project-preview__frame--secondary { width: 38%; }
+
+  /* Los demos se maquetaban a 630px CSS (200% escalado a la mitad), lo que
+     disparaba los breakpoints móviles del propio demo: el cliente veía en el
+     marco el mismo layout que ya tiene en su teléfono. A ancho natural el demo
+     se muestra tal cual, y el canvas pasa de 16/9 (una rendija de 177px) a 3/4. */
+  .project-preview__canvas iframe.project-preview__desktop { width: 100%; height: 100%; transform: none; }
+  .project-preview--single .project-preview__canvas { aspect-ratio: 3 / 4; }
+
+  /* En Aula los dos frames compartían grid-area 1/1 y sumaban 132% del stage:
+     se solapaban ~101px. Apilados, con hueco para el parallax opuesto (±24/±20). */
+  .project-preview__stage { grid-template-columns: 1fr; gap: var(--space-48); align-items: start; }
+  .project-preview__frame { grid-area: auto; }
+  .project-preview__frame--primary,
+  .project-preview__frame--secondary { width: 100%; justify-self: stretch; align-self: auto; }
+  .project-preview__frame--secondary .project-preview__canvas { aspect-ratio: 16 / 10; }
+
   .case-browser__canvas--live { height: 68svh; min-height: 520px; }
   .case-gallery__live-caption { align-items: flex-start; flex-direction: column; gap: var(--space-8); }
-  .case-nav { align-items: flex-start; }
-  .case-nav > a:last-child { max-width: 18ch; text-align: right; }
+  .case-nav { align-items: center; }
+  .case-nav > a:last-child { max-width: 22ch; text-align: right; }
   .case-hero h1 { font-size: clamp(2.8rem, 13vw, 4.2rem); }
   .case-story { padding-block: var(--space-48); }
   .case-gallery { gap: var(--space-48); }
   .case-browser { border-radius: 16px; }
   .trust-list { grid-template-columns: 1fr; }
-  .process-list li { grid-template-columns: 1fr; gap: 0; }
+  /* el h3 cortaba 51px antes que su párrafo y dejaba el borde derecho dentado */
+  .process-list h3 { max-width: none; }
   .site-footer .site-shell { grid-template-columns: 1fr; }
-  .site-footer > div > div:nth-child(2) { flex-direction: column; justify-content: flex-start; gap: var(--space-12); }
+  /* enlaces de contacto: de 10.4px y 15.6px de alto a objetivos de 44px (WCAG 2.5.8) */
+  .site-footer > div > div:nth-child(2) { flex-direction: column; justify-content: flex-start; gap: var(--space-4); font-size: 0.8rem; }
+  .site-footer > div > div:nth-child(2) a { display: inline-flex; align-items: center; min-height: 44px; }
   .site-footer > div > p { grid-column: 1; }
+
+  /* "$350.000" a la izquierda y "COP" pegado al borde derecho dejaban 70-103px
+     de vacío en medio. */
+  .price-card__price > div { justify-content: flex-start; align-items: baseline; gap: var(--space-8); }
+
+  /* Suelo tipográfico: sellos, moneda y microcopia se renderizaban a 9.3-11.2px,
+     idénticos en un monitor de 27" y en 390px. Ningún color cambia. */
+  .sector-card li { font-size: 0.75rem; }
+  .sector-card__topline,
+  .price-card__topline,
+  .price-card__price span { font-size: 0.7rem; }
+  .price-card__bonus span { font-size: 0.66rem; }
+  .final-action p { font-size: 0.8rem; }
+  .blue-proof > small { font-size: 0.8rem; }
+
+  /* área de toque del CTA de cada tarjeta de sector: de 38.6px a 44px */
+  .sector-card > a { min-height: 44px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2064,8 +2200,38 @@ main > section[id] {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+
+  /* Obligatorio: la regla de arriba pisa animation-duration pero NO
+     animation-delay. Con fill-mode backwards el hero se vería oculto durante
+     todo el delay y luego daría un salto — peor que no animar. El shorthand
+     pone animation-name:none, y sin nombre el delay deja de importar.
+     Es seguro porque el estado en reposo ya es el final de cada keyframe. */
+  .hero-line__inner,
+  .hero-promise,
+  .hero-cta-panel,
+  .hero-layout > .site-eyebrow {
+    animation: none;
+  }
+
+  /* El track congelado dejaba 7 de 10 logos inalcanzables tras overflow:hidden.
+     flex-wrap en vez de overflow-x:auto: un contenedor desplazable sin hijos
+     enfocables es la violación `scrollable-region-focusable` de axe. */
+  .tech-marquee__viewport {
+    overflow: visible;
+    mask-image: none;
+  }
   .tech-marquee__track {
     animation: none;
     transform: none;
+    width: auto;
+    flex-wrap: wrap;
+    row-gap: var(--space-32);
+  }
+  .tech-marquee__group {
+    flex-wrap: wrap;
+    row-gap: var(--space-32);
+  }
+  .tech-marquee__group[aria-hidden="true"] {
+    display: none;
   }
 }

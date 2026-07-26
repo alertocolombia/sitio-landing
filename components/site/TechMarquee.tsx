@@ -32,6 +32,7 @@ function TechnologyGroup({ duplicate = false }: { duplicate?: boolean }) {
               className="tech-marquee__brand"
               role="img"
               aria-label={technology.name}
+              style={{ color: technology.color }}
             >
             {"icon" in technology ? (
               <svg viewBox="0 0 24 24" aria-hidden="true">

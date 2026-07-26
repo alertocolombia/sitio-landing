@@ -1,74 +1,39 @@
-"use client";
-
-import { motion, useReducedMotion } from "framer-motion";
 import { whatsappLinks } from "@/content/site";
 import TechMarquee from "./TechMarquee";
 
+/**
+ * La entrada del hero es CSS puro (ver `.hero-line__inner` y compañía en
+ * globals.css). Sin framer-motion el SSR no emite ningún `style` inline, así que
+ * el hero llega bien colocado aunque el JS falle, y `prefers-reduced-motion` lo
+ * resuelve el navegador en el primer paint en vez de tras hidratar.
+ */
 export default function Hero() {
-  const reduced = useReducedMotion();
-
   return (
     <section id="inicio" className="hero-section">
       <div className="coordinate-grid" aria-hidden="true">
         <span className="coordinate-grid__axis coordinate-grid__axis--x" />
         <span className="coordinate-grid__axis coordinate-grid__axis--y" />
-        <span className="coordinate-grid__label">CO / WEB / 001</span>
       </div>
 
       <div className="site-shell hero-layout">
-        <motion.p
-          className="site-eyebrow"
-          initial={reduced ? false : { y: 10 }}
-          animate={{ y: 0 }}
-          transition={{ duration: 0.45 }}
-        >
-          PÁGINAS WEB PARA NEGOCIOS EN COLOMBIA
-        </motion.p>
+        <p className="site-eyebrow">PÁGINAS WEB PARA NEGOCIOS EN COLOMBIA</p>
 
         <div className="hero-content">
           <div className="hero-statement">
             <h1>
-              <motion.span
-                initial={reduced ? false : { y: 34 }}
-                animate={{ y: 0 }}
-                transition={{ duration: 0.7, delay: 0.08, ease: [0.2, 0.8, 0.2, 1] }}
-              >
-                Tú vendes.
-              </motion.span>
+              <span><span className="hero-line__inner">Tú vendes.</span></span>
               {" "}
-              <motion.span
-                initial={reduced ? false : { y: 34 }}
-                animate={{ y: 0 }}
-                transition={{ duration: 0.7, delay: 0.16, ease: [0.2, 0.8, 0.2, 1] }}
-              >
-                Nosotros resolvemos
-              </motion.span>
+              <span><span className="hero-line__inner">Nosotros resolvemos</span></span>
               {" "}
-              <motion.span
-                initial={reduced ? false : { y: 34 }}
-                animate={{ y: 0 }}
-                transition={{ duration: 0.7, delay: 0.24, ease: [0.2, 0.8, 0.2, 1] }}
-              >
-                tu página.
-              </motion.span>
+              <span><span className="hero-line__inner">tu página.</span></span>
             </h1>
 
-            <motion.p
-              className="hero-promise"
-              initial={reduced ? false : { y: 16 }}
-              animate={{ y: 0 }}
-              transition={{ duration: 0.55, delay: 0.52 }}
-            >
+            <p className="hero-promise">
               La diseñamos, conectamos y publicamos para que las personas puedan escribirte, reservar o comprar sin que tú tengas que aprender tecnología.
-            </motion.p>
+            </p>
           </div>
 
-          <motion.aside
-            className="hero-cta-panel"
-            initial={reduced ? false : { y: 18 }}
-            animate={{ y: 0 }}
-            transition={{ duration: 0.58, delay: 0.42 }}
-          >
+          <aside className="hero-cta-panel">
             <p className="site-eyebrow">PRIMERA ORIENTACIÓN · SIN COSTO</p>
             <h2>Descubre qué página necesita tu negocio.</h2>
             <p>
@@ -83,9 +48,8 @@ export default function Hero() {
             <small className="hero-cta-note">
               Se abre WhatsApp con un mensaje guía. Responder no te compromete a nada.
             </small>
-          </motion.aside>
+          </aside>
         </div>
-
       </div>
 
       <div className="hero-technologies">

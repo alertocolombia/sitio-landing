@@ -1,13 +1,20 @@
 "use client";
 
 import { motion, useReducedMotion, useScroll, useSpring } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useSyncExternalStore } from "react";
 import { pricing } from "@/content/site";
 import Reveal from "./Reveal";
+
+/** El estado nunca cambia tras hidratar, así que no hay a qué suscribirse. */
+const subscribeNoop = () => () => {};
 
 export default function PricingSection() {
   const section = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
+  // useReducedMotion() devuelve null en el servidor, así que la rama que se
+  // serializaba era siempre la animada: las tarjetas salían con opacity:0 en el
+  // HTML y sin JS la sección que vende quedaba en blanco.
+  const hydrated = useSyncExternalStore(subscribeNoop, () => true, () => false);
   const { scrollYProgress } = useScroll({
     target: section,
     offset: ["start end", "end start"],
@@ -23,7 +30,7 @@ export default function PricingSection() {
       <motion.div
         className="pricing-progress"
         aria-hidden="true"
-        style={reduced ? { scaleX: 1 } : { scaleX: progress }}
+        style={!hydrated || reduced ? { scaleX: 1 } : { scaleX: progress }}
       />
 
       <div className="site-shell">
@@ -39,8 +46,8 @@ export default function PricingSection() {
           {pricing.map((plan, index) => (
             <motion.div
               className="pricing-card-motion"
-              key={plan.name}
-              initial={reduced ? false : { opacity: 0, y: 56, scale: 0.96 }}
+              key={`${plan.name}-${hydrated}`}
+              initial={!hydrated || reduced ? false : { opacity: 0, y: 56, scale: 0.96 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
               whileHover={reduced ? undefined : { y: -8 }}
               viewport={{ once: true, amount: 0.16 }}

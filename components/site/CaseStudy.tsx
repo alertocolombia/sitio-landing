@@ -95,7 +95,7 @@ export default function CaseStudy({
                 <b>PANTALLA DEL PROYECTO</b>
               </div>
               <div className="case-browser__canvas">
-                <Image src={image.src} alt={image.alt} fill sizes="(max-width: 899px) 90vw, 80vw" />
+                <Image src={image.src} alt={image.alt} fill sizes="(max-width: 899px) 90vw, (max-width: 1565px) 92vw, 1440px" />
               </div>
             </div>
             <figcaption>{image.caption}</figcaption>

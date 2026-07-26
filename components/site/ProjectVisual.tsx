@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
 import { siShopify } from "simple-icons/icons";
-import { useRef } from "react";
+import { useRef, useSyncExternalStore } from "react";
 
 type ProjectTone = "vigor" | "ciclo" | "alerto" | "aula";
 
@@ -67,6 +67,9 @@ const previews: Record<
   },
 };
 
+/** El estado nunca cambia tras hidratar, así que no hay a qué suscribirse. */
+const subscribeNoop = () => () => {};
+
 function PreviewContent({ media }: { media: PreviewMedia }) {
   if (media.type === "live") {
     return (
@@ -99,6 +102,10 @@ export default function ProjectVisual({
 }) {
   const container = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
+  // Igual que en PricingSection: useReducedMotion() es null en el servidor, así
+  // que el SSR serializaba el parallax y sin JS los marcos quedaban corridos
+  // 24px, recortándose contra el overflow:hidden del contenedor.
+  const hydrated = useSyncExternalStore(subscribeNoop, () => true, () => false);
   const project = previews[tone];
   const { scrollYProgress } = useScroll({
     target: container,
@@ -134,7 +141,7 @@ export default function ProjectVisual({
       <div className="project-preview__stage">
         <motion.div
           className="project-preview__frame project-preview__frame--primary"
-          style={reduced ? undefined : { y: primaryY }}
+          style={!hydrated || reduced ? undefined : { y: primaryY }}
         >
           <div className="project-preview__bar">
             <b>{project.primaryLabel}</b>
@@ -147,7 +154,7 @@ export default function ProjectVisual({
         {project.secondary && project.secondaryLabel && (
           <motion.div
             className="project-preview__frame project-preview__frame--secondary"
-            style={reduced ? undefined : { y: secondaryY }}
+            style={!hydrated || reduced ? undefined : { y: secondaryY }}
           >
             <div className="project-preview__bar"><b>{project.secondaryLabel}</b></div>
             <div className="project-preview__canvas">
