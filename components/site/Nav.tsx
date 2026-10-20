@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Wordmark } from "@/components/brand/Logo";
 import { navigation, whatsappLinks } from "@/content/site";
+import heroStyles from "./Hero.module.css";
 
 const COMPACT = "(max-width: 640px)";
 
@@ -13,7 +14,8 @@ function subscribeCompact(onChange: () => void) {
   return () => mq.removeEventListener("change", onChange);
 }
 
-export default function Nav() {
+export default function Nav({ blendHero = false }: { blendHero?: boolean }) {
+  const header = useRef<HTMLElement>(null);
   const [hidden, setHidden] = useState(false);
   const [open, setOpen] = useState(false);
   const lastY = useRef(0);
@@ -25,6 +27,35 @@ export default function Nav() {
     () => window.matchMedia(COMPACT).matches,
     () => false,
   );
+
+  useEffect(() => {
+    if (!blendHero) return;
+    const scene = document.getElementById("inicio");
+    const products = document.getElementById("presencia");
+    const lightPanel = products?.querySelector<HTMLElement>('[data-nav-surface="light"]');
+    let frame = 0;
+    function updateSurface() {
+      frame = 0;
+      if (!header.current || !products || document.body.style.position === "fixed") return;
+      const bounds = products.getBoundingClientRect();
+      const lightBounds = lightPanel?.getBoundingClientRect();
+      const overLightPanel = lightBounds && lightBounds.top <= 72 && lightBounds.bottom > 36;
+      const revealing = scene?.dataset.enhanced === "true" && Number(scene.dataset.progress) >= 50;
+      const overProducts = bounds.top <= 72 && bounds.bottom > 36;
+      header.current.dataset.surface = bounds.bottom <= 36 ? "default" : overLightPanel ? "light" : revealing || overProducts ? "blue" : "hero";
+    }
+    function schedule() {
+      if (!frame) frame = requestAnimationFrame(updateSurface);
+    }
+    updateSurface();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, [blendHero]);
 
   useEffect(() => {
     if (compact) return;
@@ -69,12 +100,12 @@ export default function Nav() {
       body.style.left = previous.left;
       body.style.right = previous.right;
       document.removeEventListener("keydown", onKeyDown);
-      window.scrollTo(0, y);
+      window.scrollTo({ top: y, left: 0, behavior: "instant" });
     };
   }, [open]);
 
   return (
-    <header className={`site-nav ${hidden && !compact ? "site-nav--hidden" : ""}`}>
+    <header ref={header} className={`site-nav ${hidden && !compact ? "site-nav--hidden" : ""} ${blendHero ? heroStyles.navBlend : ""}`}>
       <nav className="site-shell site-nav__inner" aria-label="Navegación principal">
         <a href="#inicio" aria-label="Sitio, volver al inicio" className="site-nav__logo">
           <Wordmark className="h-8 w-auto" />
@@ -82,14 +113,14 @@ export default function Nav() {
 
         <div className="site-nav__links">
           {navigation.map((item) => (
-            <a key={item.href} href={item.href}>
-              {item.label}
+            <a key={item.href} href={blendHero && item.href === "#servicios" ? "#presencia" : item.href}>
+              {blendHero && item.href === "#servicios" ? "Productos" : item.label}
             </a>
           ))}
         </div>
 
-        <a className="site-button site-button--small" href={whatsappLinks.general} target="_blank" rel="noreferrer">
-          Hablemos
+        <a className={heroStyles.navContact} href={whatsappLinks.general} target="_blank" rel="noreferrer" aria-label="Contáctanos 24/7 por WhatsApp">
+          Contáctanos 24/7 <span aria-hidden="true">↗</span>
         </a>
 
         <button
@@ -107,8 +138,8 @@ export default function Nav() {
       {open && (
         <div className="site-mobile-menu">
           {navigation.map((item) => (
-            <a key={item.href} href={item.href} onClick={() => setOpen(false)}>
-              {item.label}
+            <a key={item.href} href={blendHero && item.href === "#servicios" ? "#presencia" : item.href} onClick={() => setOpen(false)}>
+              {blendHero && item.href === "#servicios" ? "Productos" : item.label}
             </a>
           ))}
         </div>

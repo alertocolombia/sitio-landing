@@ -12,13 +12,17 @@ import PricingSection from "./PricingSection";
 import Reveal from "./Reveal";
 import SectorRail from "./SectorRail";
 import WorkRail from "./WorkRail";
+import PresenceBundle from "./PresenceBundle";
+import HeroShowcase from "./HeroShowcase";
 
 export default function SiteLanding() {
   return (
     <>
-      <Nav />
+      <Nav blendHero />
       <main>
         <Hero />
+        <PresenceBundle />
+        <HeroShowcase />
 
         <section id="tranquilidad" className="thesis-section">
           <div className="thesis-grid">
