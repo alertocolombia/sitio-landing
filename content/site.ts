@@ -20,8 +20,8 @@ export const site = {
   domain: "sitio.com.co",
   url: "https://sitio.com.co",
   email: contact.email,
-  instagram: "@sitio.colombia",
-  instagramUrl: "https://instagram.com/sitio.colombia",
+  instagram: "@sitio.com.co",
+  instagramUrl: "https://www.instagram.com/sitio.com.co/",
   phone: contact.phone,
   whatsapp: whatsappLinks.general,
   description:
