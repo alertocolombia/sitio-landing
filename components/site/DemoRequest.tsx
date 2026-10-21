@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
-import { contactDays, contactMethods, contactTimes, demoGoals as goals, demoSummary } from "@/lib/demo-request";
+import { contactDays, contactMethods, contactTimes, demoGoals as goals, demoRecipient, demoSummary } from "@/lib/demo-request";
 import styles from "./DemoRequest.module.css";
 import heroStyles from "./Hero.module.css";
 
@@ -32,7 +32,7 @@ export default function DemoRequest({ compact = false, initialIdea = "", initial
   const [website, setWebsite] = useState("");
   const manualDetails = useRef<HTMLDetailsElement>(null);
   const summary = demoSummary({ name, goal, idea, phone, method, day, time, consent });
-  const mailto = `mailto:sitio.web.co@gmail.com?subject=${encodeURIComponent("Solicitud de demo gratis — Sitio")}&body=${encodeURIComponent(summary)}`;
+  const mailto = `mailto:${demoRecipient}?subject=${encodeURIComponent("Solicitud de demo gratis — Sitio")}&body=${encodeURIComponent(summary)}`;
 
   useEffect(() => {
     if (!open) return;
@@ -146,7 +146,7 @@ export default function DemoRequest({ compact = false, initialIdea = "", initial
                 <label className={styles.field} htmlFor={`${id}-day`}>Día<select id={`${id}-day`} value={day} onChange={(event) => setDay(event.target.value)}>{contactDays.map((item) => <option key={item}>{item}</option>)}</select></label>
                 <label className={styles.field} htmlFor={`${id}-time`}>Horario · Colombia<select id={`${id}-time`} value={time} onChange={(event) => setTime(event.target.value)}>{contactTimes.map((item) => <option key={item}>{item}</option>)}</select></label>
               </div>
-              <label className={styles.consent}><input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} required /><span>Autorizo a Sitio a usar estos datos para responder mi solicitud. Puedo pedir su eliminación en sitio.web.co@gmail.com.</span></label>
+              <label className={styles.consent}><input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} required /><span>Autorizo a Sitio a usar estos datos para responder mi solicitud. Puedo pedir su eliminación en {demoRecipient}.</span></label>
               <button className={styles.continue} type="submit">Revisar mi solicitud <span aria-hidden="true">→</span></button>
               <button className={styles.back} type="button" onClick={() => goTo(0)}>Volver a mi idea</button>
             </form>
@@ -155,12 +155,12 @@ export default function DemoRequest({ compact = false, initialIdea = "", initial
               <div className={styles.recommendation}><span>Punto de partida</span><strong>{goal}</strong><p>{recommendations[goal]}</p></div>
               <dl className={styles.summary}><div><dt>Tu idea</dt><dd>{idea}</dd></div><div><dt>Contacto</dt><dd>{name} · {phone}<br />{method} · {day}<br />{time}, hora de Colombia</dd></div></dl>
               {sendState === "sent" ? (
-                <p className={styles.success} role="status">Solicitud enviada a sitio.web.co@gmail.com. Esto no confirma una cita ni implica un pago.</p>
+                <p className={styles.success} role="status">Solicitud enviada a {demoRecipient}. Esto no confirma una cita ni implica un pago.</p>
               ) : (
                 <>
                   {sendError && <p className={styles.previewNotice} role="alert">{sendError}</p>}
                   <button className={styles.continue} type="button" disabled={sendState === "sending"} onClick={sendRequest}>{sendState === "sending" ? "Enviando…" : "Pedir mi demo gratis"}<span aria-hidden="true">→</span></button>
-                  <p className={styles.footnote}>El resumen llegará a sitio.web.co@gmail.com. Sin pagos ni suscripciones.</p>
+                  <p className={styles.footnote}>El resumen llegará a {demoRecipient}. Sin pagos ni suscripciones.</p>
                   {sendState === "error" && <a className={styles.back} href={mailto}>Enviar desde mi correo ↗</a>}
                 </>
               )}
