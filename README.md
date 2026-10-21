@@ -13,7 +13,8 @@ Abra `http://localhost:3000`.
 
 ## Dónde editar
 
-- `content/site.ts`: contacto, servicios, precios, proyectos, proceso y FAQ.
+- `content/contact.ts`: correo y WhatsApp oficiales. Este único archivo actualiza los botones, el pie de página, los datos para buscadores, el destinatario de solicitudes de demo y su alternativa por correo.
+- `content/site.ts`: servicios, precios, proyectos, proceso y FAQ.
 - `app/tokens.css`: única escala de espaciado y ritmo (`--card-pad`, secciones y flujos).
 - `app/globals.css`: sistema visual y responsive; todo padding, margin y gap consume esos tokens. `--site-blue` es el azul canónico.
 - `components/site/`: landing, animaciones y previews del portafolio.
