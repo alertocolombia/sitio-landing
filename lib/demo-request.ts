@@ -1,8 +1,10 @@
+import { contact } from "@/content/contact";
+
 export const demoGoals = ["Presentar mi negocio", "Vender productos", "Crear una herramienta"];
 export const contactMethods = ["WhatsApp", "Llamada"];
 export const contactDays = ["Cualquier día hábil", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
 export const contactTimes = ["09:00–12:00", "12:00–15:00", "15:00–18:00"];
-export const demoRecipient = "sitio.web.co@gmail.com";
+export const demoRecipient = contact.email;
 
 export type DemoRequestData = {
   goal: string;
