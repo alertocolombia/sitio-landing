@@ -1,5 +1,4 @@
-const whatsappUrl = (message: string) =>
-  `https://wa.me/573173799264?text=${encodeURIComponent(message)}`;
+import { contact, whatsappUrl } from "./contact";
 
 export const whatsappLinks = {
   general: whatsappUrl(
@@ -20,10 +19,10 @@ export const site = {
   name: "Sitio",
   domain: "sitio.com.co",
   url: "https://sitio.com.co",
-  email: "sitio.web.co@gmail.com",
+  email: contact.email,
   instagram: "@sitio.colombia",
   instagramUrl: "https://instagram.com/sitio.colombia",
-  phone: "+57 317 379 9264",
+  phone: contact.phone,
   whatsapp: whatsappLinks.general,
   description:
     "Creamos páginas web y tiendas en línea para negocios en Colombia. Tú vendes; Sitio resuelve el diseño, las conexiones y la publicación.",
