@@ -14,6 +14,7 @@ import SectorRail from "./SectorRail";
 import WorkRail from "./WorkRail";
 import PresenceBundle from "./PresenceBundle";
 import HeroShowcase from "./HeroShowcase";
+import InstagramSection from "./InstagramSection";
 
 export default function SiteLanding() {
   return (
@@ -136,6 +137,8 @@ export default function SiteLanding() {
             </div>
           </div>
         </section>
+
+        <InstagramSection />
 
         <section className="faq-section">
           <div className="site-shell faq-grid">
