@@ -7,7 +7,8 @@ import ts from 'typescript';
 const asModule = (source) => 'data:text/javascript;base64,' + Buffer.from(ts.transpileModule(source, {
   compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 },
 }).outputText).toString('base64');
-const sharedUrl = asModule(await readFile(new URL('../lib/demo-request.ts', import.meta.url), 'utf8'));
+const contactUrl = asModule(await readFile(new URL('../content/contact.ts', import.meta.url), 'utf8'));
+const sharedUrl = asModule((await readFile(new URL('../lib/demo-request.ts', import.meta.url), 'utf8')).replace('@/content/contact', contactUrl));
 const source = (await readFile(new URL('../app/api/demo-request/route.ts', import.meta.url), 'utf8')).replace('@/lib/demo-request', sharedUrl);
 const { POST } = await import(asModule(source));
 const valid = { name: 'Prueba local', phone: '+57 300 000 0000', goal: 'Vender productos', idea: 'Una tienda de ropa de ejemplo.', method: 'Llamada', day: 'Miércoles', time: '15:00–18:00', consent: true, website: '' };
@@ -46,7 +47,8 @@ test('email request safeguards and provider outcomes (no email sent)', async (t)
       assert.deepEqual(await response.json(), { accepted: true });
       const payload = JSON.parse(calls[0].body);
       assert.equal(calls[0].url, 'https://api.resend.com/emails');
-      assert.deepEqual(payload.to, ['sitio.web.co@gmail.com']);
+      assert.deepEqual(payload.to, ['hola@sitio.com.co']);
+      assert.equal(payload.reply_to, 'hola@sitio.com.co');
       assert.equal(payload.from, 'Sitio <solicitudes@sitio.com.co>');
       assert.match(payload.text, /Llamada/);
       assert.match(payload.text, /Miércoles/);
