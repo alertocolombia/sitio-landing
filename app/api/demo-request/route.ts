@@ -55,7 +55,7 @@ export async function POST(request: Request) {
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
-        "Idempotency-Key": `sitio-demo/${digest(text)}`,
+        "Idempotency-Key": `sitio-demo/${digest(`${demoRecipient}\n${text}`)}`,
       },
       body: JSON.stringify({
         from: `Sitio <solicitudes@${domain}>`,
